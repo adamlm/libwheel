@@ -13,9 +13,10 @@ namespace wheel {
  *
  * @tparam SpaceType Space to be sampled
  */
-template <typename SpaceType>
+template <typename SpaceT>
 class UniformSampler : public SamplerBase {
   public:
+    using SpaceType = SpaceT;
     using VectorType = typename SpaceType::VectorType;
 
     /**
