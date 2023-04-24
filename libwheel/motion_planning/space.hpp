@@ -2,6 +2,7 @@
 #define LIBWHEEL_MOTION_PLANNING_SPACE_HPP
 
 #include <array>
+#include <vector>
 
 #include "libwheel/motion_planning/bound_range.hpp"
 
@@ -17,6 +18,7 @@ template <typename SpaceVectorType>
 class Space {
 public:
     using VectorType = SpaceVectorType;
+    using PathType = std::vector<VectorType>;
     static constexpr auto kDimensions{VectorType::kDimensions};
 
     /**

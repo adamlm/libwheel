@@ -8,6 +8,11 @@ target_include_directories(wheel_motion_planningLibrary
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
 )
 
+target_link_libraries(wheel_motion_planningLibrary
+  INTERFACE
+    Boost::graph
+)
+
 target_compile_features(wheel_motion_planningLibrary
   INTERFACE
     cxx_std_20

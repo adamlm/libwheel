@@ -2,6 +2,7 @@
 #define LIBWHEEL_MOTION_PLANNING_R2_SPACE_HPP
 
 #include <array>
+#include <cmath>
 #include <sstream>
 #include <string>
 
@@ -42,6 +43,32 @@ struct R2Vector {
 
         return stream.str();
     }
+
+    /**
+     * @brief Calculate the distance between two R2Vectors
+     *
+     * This function implements the Euclidean distance
+     *
+     * @param a First R2Vector
+     * @param b Second R2Vector
+     * @return double Euclidean distance between R2Vectors
+     */
+    static auto distance(const R2Vector& a, const R2Vector& b) -> double {
+        return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));
+    }
+
+    static auto interpolate(const R2Vector &source, const R2Vector &target, std::size_t num_samples) -> std::vector<wheel::R2Vector> {
+    std::vector<wheel::R2Vector> configs;
+
+    const auto step_x{(target.x - source.x) / num_samples};
+    const auto step_y{(target.y - source.y) / num_samples};
+
+    for (auto i{1}; i <= num_samples; ++i) {
+        configs.emplace_back(wheel::R2Vector{source.x + i * step_x, source.y + i * step_y});
+    }
+
+    return configs;
+}
 
     double x;
     double y;
