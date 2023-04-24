@@ -1,0 +1,35 @@
+{
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cmake-tools",
+				"streetsidesoftware.code-spell-checker"
+			]
+		}
+	},
+	"capAdd": [
+		"SYS_PTRACE"
+	],
+	"securityOpt": [
+		"seccomp=unconfined"
+	],
+	"containerUser": "vscode",
+	"remoteUser": "vscode",
+	"workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace,Z",
+	"workspaceFolder": "/workspace",
+	"runArgs": [
+		"--userns=keep-id"
+	],
+	"postCreateCommand": {
+		"conan profile": [
+			"conan",
+			"profile",
+			"detect",
+			"--force"
+		]
+	}
+}
