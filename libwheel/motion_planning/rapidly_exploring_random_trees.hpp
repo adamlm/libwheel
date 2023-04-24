@@ -118,7 +118,7 @@ auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &s
 
             const auto vertices = detail::findPath(graph, source_vertex, target_vertex);
             if (vertices) {
-                std::vector<R2Vector> path;
+                typename SamplerType::SpaceType::PathType path;
                 path.reserve(std::size(vertices.value()));
                 std::ranges::transform(vertices.value(), std::back_inserter(path),
                                        [&graph](const auto &vertex) { return graph[vertex].config; });
