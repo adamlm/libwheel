@@ -49,6 +49,22 @@ template <std::floating_point StorageType>
     return AngleDisplacement<StorageType>{lhs, rhs};
 }
 
+template <std::floating_point StorageType>
+class AngleDistance {
+  public:
+    explicit AngleDistance(StorageType value) noexcept : value_{value} {}
+
+    [[nodiscard]] auto getValue() const noexcept -> StorageType { return value_; }
+
+  private:
+    StorageType value_;
+};
+
+template <std::floating_point StorageType>
+[[nodiscard]] inline auto distance(const Angle<StorageType> &lhs, const Angle<StorageType> &rhs) {
+    return AngleDistance<StorageType>{std::abs(displacement(lhs, rhs).getValue())};
+}
+
 } // namespace wheel
 
 #endif // LIBWHEEL_ANGLE_ANGLE_HPP

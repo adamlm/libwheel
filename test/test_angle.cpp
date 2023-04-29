@@ -52,3 +52,13 @@ TEST(AngleTest, DisplacementSameAngle) {
 
     EXPECT_DOUBLE_EQ(wheel::displacement(angle, angle).getValue(), 0.0);
 }
+
+TEST(AngleTest, Distance) {
+    using Angle = wheel::Angle<double>;
+
+    const Angle angle_1{2.0 * std::numbers::pi / 180.0};
+    const Angle angle_2{359.0 * std::numbers::pi / 180.0};
+
+    // Rounding errors prevent the two values from being within 4 ULP of each other
+    EXPECT_NEAR(wheel::distance(angle_1, angle_2).getValue(), 3.0 * std::numbers::pi / 180.0, 1e-15);
+}
