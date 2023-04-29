@@ -3,6 +3,28 @@ name: Continuous Integration
 on: [push]
 
 jobs:
+  Static-Analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Conan
+        run: |
+          python3 -m pip install conan
+          conan profile detect --force
+
+      - uses: actions/checkout@v3
+
+      - name: Configure Conan
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release .
+
+      - name: Run clang-tidy
+        run: |
+          clang-tidy -p build/ test/*.cpp libwheel/angle/*.hpp
+
   Unit-Tests:
     runs-on: ubuntu-latest
     steps:
