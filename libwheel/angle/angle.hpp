@@ -7,6 +7,9 @@
 namespace wheel {
 
 template <std::floating_point StorageType>
+class AngleDisplacement;
+
+template <std::floating_point StorageType>
 class Angle {
   public:
     explicit Angle(StorageType value) noexcept : value_{std::polar(static_cast<StorageType>(1.0), value)} {}
@@ -24,8 +27,27 @@ class Angle {
     auto setValue(StorageType value) noexcept { value_ = std::polar(static_cast<StorageType>(1.0), value); }
 
   private:
+    friend AngleDisplacement<StorageType>;
+
     std::complex<StorageType> value_;
 };
+
+template <std::floating_point StorageType>
+class AngleDisplacement {
+  public:
+    explicit AngleDisplacement(const Angle<StorageType> &lhs, const Angle<StorageType> &rhs) noexcept
+        : value_{std::arg(rhs.value_ / lhs.value_)} {}
+
+    [[nodiscard]] auto getValue() const noexcept -> StorageType { return value_; }
+
+  private:
+    StorageType value_;
+};
+
+template <std::floating_point StorageType>
+[[nodiscard]] inline auto displacement(const Angle<StorageType> &lhs, const Angle<StorageType> &rhs) {
+    return AngleDisplacement<StorageType>{lhs, rhs};
+}
 
 } // namespace wheel
 
