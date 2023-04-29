@@ -9,6 +9,7 @@ jobs:
       - name: Install Conan
         run: |
           python3 -m pip install conan
+          conan profile detect --force
 
       - uses: actions/checkout@v3
 
