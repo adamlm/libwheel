@@ -48,7 +48,7 @@ TEST(AngleTest, DisplacementOneEighty) {
 }
 
 TEST(AngleTest, DisplacementSameAngle) {
-    wheel::Angle<double> angle{3 * std::numbers::pi / 4.0};
+    const wheel::Angle<double> angle{3 * std::numbers::pi / 4.0};
 
     EXPECT_DOUBLE_EQ(wheel::displacement(angle, angle).getValue(), 0.0);
 }
