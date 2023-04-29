@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(wheel_angle)
+project(wheel_angle VERSION 0.1.0)
 enable_testing()
 
 option(wheel_angle_ENABLE_TESTING "Enable unit test for Wheel.Angle" ${PROJECT_IS_TOP_LEVEL})
