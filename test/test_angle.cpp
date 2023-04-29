@@ -26,3 +26,29 @@ TEST(AngleTest, ConstructorNegativeBeyondTwoPi) {
     // Rounding errors prevent the two values from being within 4 ULP of each other
     EXPECT_NEAR(angle.getValue(), 0.0, 1e-15);
 }
+
+TEST(AngleTest, Displacement) {
+    using Angle = wheel::Angle<double>;
+
+    const Angle angle_1{std::numbers::pi / 2.0};
+    const Angle angle_2{std::numbers::pi};
+
+    EXPECT_DOUBLE_EQ(wheel::displacement(angle_1, angle_2).getValue(), std::numbers::pi / 2.0);
+    EXPECT_DOUBLE_EQ(wheel::displacement(angle_2, angle_1).getValue(), -std::numbers::pi / 2.0);
+}
+
+TEST(AngleTest, DisplacementOneEighty) {
+    using Angle = wheel::Angle<double>;
+
+    const Angle angle_1{0.0};
+    const Angle angle_2{std::numbers::pi};
+
+    EXPECT_DOUBLE_EQ(wheel::displacement(angle_1, angle_2).getValue(), std::numbers::pi);
+    EXPECT_DOUBLE_EQ(wheel::displacement(angle_2, angle_1).getValue(), -std::numbers::pi);
+}
+
+TEST(AngleTest, DisplacementSameAngle) {
+    wheel::Angle<double> angle{3 * std::numbers::pi / 4.0};
+
+    EXPECT_DOUBLE_EQ(wheel::displacement(angle, angle).getValue(), 0.0);
+}
