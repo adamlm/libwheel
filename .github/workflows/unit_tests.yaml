@@ -6,6 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Conan
+        run: |
+          python3 -m pip install conan
+
       - uses: actions/checkout@v3
 
       - name: Configure Conan
