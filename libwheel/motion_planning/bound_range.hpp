@@ -27,10 +27,10 @@ struct BoundRange {
     /**
      * @brief Construct a new BoundRange object
      *
-     * @param lower Lower range value
-     * @param upper Upper range value
+     * @param l Lower range value
+     * @param u Upper range value
      */
-    explicit BoundRange(LowerBound lower, UpperBound upper) : lower{lower}, upper{upper} {
+    explicit BoundRange(LowerBound l, UpperBound u) : lower{l}, upper{u} {
         assert((lower.get() <= upper.get()) && "lower bound must be <= upper bound");
     }
 
