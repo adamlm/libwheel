@@ -17,7 +17,7 @@ auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typen
         return *boost::vertices(graph).first;
     }
 
-    typename GraphType::vertex_descriptor nearest_vertex;
+    typename GraphType::vertex_descriptor nearest_vertex{0U};
     auto nearest_distance{std::numeric_limits<double>::max()};
 
     for (auto [it, end] = boost::vertices(graph); it < end - 1; ++it) {
@@ -33,7 +33,7 @@ auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typen
 
 template <typename GraphType, typename SamplerType>
 auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples) -> void {
-    for (auto i{0}; i < num_samples; ++i) {
+    for (auto i{0U}; i < num_samples; ++i) {
         const auto sampled_config = sampler.nextSample();
 
         auto nearest_vertex = nearestElementTo(graph, sampled_config);
@@ -65,7 +65,8 @@ auto pathExists(const GraphType &graph, const VectorType &target) -> bool {
 }
 
 template <typename GraphType, typename VertexType>
-auto findPath(const GraphType &graph, const VertexType &source, const VertexType &target) -> std::optional<std::vector<VertexType>> {
+auto findPath(const GraphType &graph, const VertexType &source, const VertexType &target)
+    -> std::optional<std::vector<VertexType>> {
     std::vector<VertexType> predecessors(boost::num_vertices(graph), std::numeric_limits<VertexType>::max());
     predecessors[source] = source;
 
@@ -95,14 +96,15 @@ auto findPath(const GraphType &graph, const VertexType &source, const VertexType
 } // namespace detail
 
 template <typename SamplerType>
-auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &source, const typename SamplerType::VectorType target)
+auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &source,
+                 const typename SamplerType::VectorType target)
     -> std::optional<typename SamplerType::SpaceType::PathType> {
 
-    struct VertexProperties { typename SamplerType::VectorType config; };
+    struct VertexProperties {
+        typename SamplerType::VectorType config;
+    };
 
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperties>;
-    using Vertex = typename Graph::vertex_descriptor;
-    using Edge = typename Graph::edge_descriptor;
 
     Graph graph;
     const auto source_vertex = boost::add_vertex(VertexProperties{source}, graph);

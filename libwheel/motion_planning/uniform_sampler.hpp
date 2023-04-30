@@ -40,7 +40,7 @@ class UniformSampler : public SamplerBase {
     auto nextSample() -> VectorType {
         std::array<double, SpaceType::kDimensions> sampled_values;
 
-        for (auto i{0}; i < std::size(sampled_values); ++i) {
+        for (auto i{0U}; i < std::size(sampled_values); ++i) {
             sampled_values.at(i) = distributions_.at(i)(generator_);
         }
 

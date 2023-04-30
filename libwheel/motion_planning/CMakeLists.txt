@@ -18,6 +18,25 @@ target_compile_features(wheel_motion_planningLibrary
     cxx_std_20
 )
 
+target_compile_options(wheel_motion_planningLibrary
+  INTERFACE
+    -Wall
+    -Wextra
+    -Wshadow
+    -Wnon-virtual-dtor
+    -Wpedantic
+    -Wold-style-cast
+    -Wunused
+    -Wconversion
+    -Wsign-conversion
+    -Wcast-align
+    -Woverloaded-virtual
+    -Wdouble-promotion
+    -Wformat=2
+    -Wimplicit-fallthrough
+    -Werror
+)
+
 set_target_properties(wheel_motion_planningLibrary PROPERTIES
   EXPORT_NAME motion_planning
 )
