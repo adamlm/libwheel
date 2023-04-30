@@ -10,12 +10,12 @@ namespace wheel {
 /**
  * @brief Wrapped type representing a BoundRange's lower bound
  */
-using LowerBound = TaggedValue<float, struct LowerBoundTag>;
+using LowerBound = TaggedValue<double, struct LowerBoundTag>;
 
 /**
  * @brief Wrapped type representing a BoundRange's upper bound
  */
-using UpperBound = TaggedValue<float, struct UpperBoundTag>;
+using UpperBound = TaggedValue<double, struct UpperBoundTag>;
 
 /**
  * @brief One-dimensional bounded range between [lower, upper] (inclusive)
