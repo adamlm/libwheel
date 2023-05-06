@@ -30,3 +30,15 @@ static_assert(!wheel::has_value_member<wheel::begin_type<wheel::TypeList<>>>);
 static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<int>>, int>);
 static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<float, int>>, float>);
 static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<float, float>>, float>);
+
+// Compile-time tests for next type in a TypeList
+static_assert(std::is_same_v<wheel::next_type<int, wheel::TypeList<int, float, char>>::type, float>);
+static_assert(std::is_same_v<wheel::next_type<float, wheel::TypeList<int, float, char>>::type, char>);
+static_assert(std::is_same_v<wheel::next_type<float, wheel::TypeList<float, float, char>>::type, float>);
+
+static_assert(!wheel::has_type_member<wheel::next_type<char, wheel::TypeList<int, float, char>>>);
+static_assert(!wheel::has_type_member<wheel::next_type<char, wheel::TypeList<>>>);
+
+static_assert(std::is_same_v<wheel::next_type_t<int, wheel::TypeList<int, float, char>>, float>);
+static_assert(std::is_same_v<wheel::next_type_t<float, wheel::TypeList<int, float, char>>, char>);
+static_assert(std::is_same_v<wheel::next_type_t<float, wheel::TypeList<float, float, char>>, float>);

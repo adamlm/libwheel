@@ -119,6 +119,74 @@ template <typename TypeList>
     requires has_type_member<begin_type<TypeList>>
 using begin_type_t = typename begin_type<TypeList>::type;
 
+/**
+ * @brief Return the next type in a TypeList after the specified type
+ *
+ * This metafunction returns the next type in a type member alias. If the TypeList has no next type, this type member
+ * will not exist.
+ *
+ * This is the primary template.
+ */
+template <typename, typename>
+struct next_type;
+
+/**
+ * @brief Return the next type in a TypeList after the specified type
+ *
+ * This metafunction returns the next type in a type member alias. If the TypeList has no next type, this type member
+ * will not exist.
+ *
+ * This is the partial template specialization for when the TypeList is empty.
+ *
+ * @tparam StartType Starting type in the TypeList
+ */
+template <typename StartType>
+struct next_type<StartType, TypeList<>> {};
+
+/**
+ * @brief Return the next type in a TypeList after the specified type
+ *
+ * This metafunction returns the next type in a type member alias. If the TypeList has no next type, this type member
+ * will not exist.
+ *
+ * This is the partial template specialization for when current type is at the beginning of the TypeList.
+ *
+ * @tparam StartType Starting type in the TypeList. Metafunction should return the type after this one
+ * @tparam NextType Type following StartType in the TypeList
+ * @tparam RemainingTypes Parameter pack for the remaining types in the TypeList
+ */
+template <typename StartType, typename NextType, typename... RemainingTypes>
+struct next_type<StartType, TypeList<StartType, NextType, RemainingTypes...>> : std::type_identity<NextType> {};
+
+/**
+ * @brief Return the next type in a TypeList after the specified type
+ *
+ * This metafunction returns the next type in a type member alias. If the TypeList has no next type, this type member
+ * will not exist.
+ *
+ * This is the partial template specialization for when current type is not at the beginning of the TypeList.
+ *
+ * @tparam StartType Starting type in the TypeList. Metafunction should return the type after this one
+ * @tparam FrontType Type at the front of the TypeList
+ * @tparam RemainingTypes Parameter pack for the remaining types in the TypeList
+ */
+template <typename StartType, typename FrontType, typename... RemainingTypes>
+    requires has_type_member<next_type<StartType, TypeList<RemainingTypes...>>>
+struct next_type<StartType, TypeList<FrontType, RemainingTypes...>>
+    : std::type_identity<typename next_type<StartType, TypeList<RemainingTypes...>>::type> {};
+
+/**
+ * @brief Helper template to return the next type in a TypeList after the specified type
+ *
+ * This is an alias for next_type<StartType, TypeList>::value.
+ *
+ * @tparam StartType Current type in the TypeList
+ * @tparam TypeList TypeList to get the next type from
+ */
+template <typename StartType, typename TypeList>
+    requires has_type_member<next_type<StartType, TypeList>>
+using next_type_t = typename next_type<StartType, TypeList>::type;
+
 } // namespace wheel
 
 #endif // LIBWHEEL_METAPROGRAMMING_TYPE_LIST_HPP
