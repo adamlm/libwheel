@@ -11,6 +11,7 @@ target_include_directories(wheel_motion_planningLibrary
 target_link_libraries(wheel_motion_planningLibrary
   INTERFACE
     Boost::graph
+    libwheel::metaprogramming
 )
 
 target_compile_features(wheel_motion_planningLibrary
