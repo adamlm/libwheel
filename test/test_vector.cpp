@@ -51,3 +51,20 @@ TEST(VectorTest, MakeRandomVector) {
     EXPECT_EQ(vector.get<Y>(), 2);
     EXPECT_EQ(vector.get<Z>(), 0);
 }
+
+TEST(VectorTest, ToStringInt) {
+    const TestVector vector{1, 2, 3};
+
+    const auto string{wheel::to_string(vector)};
+
+    EXPECT_STREQ(string.c_str(), "1 2 3");
+}
+
+TEST(VectorTest, ToStringFloat) {
+    using TestVectorFloat = wheel::Vector<wheel::IndexTypeList<X, Y, Z>, wheel::StorageTypeList<float, float, float>>;
+
+    const TestVectorFloat vector{1.2F, 2.4444F, 3.0F};
+    const auto string{wheel::to_string(vector)};
+
+    EXPECT_STREQ(string.c_str(), "1.200000 2.444400 3.000000");
+}

@@ -71,6 +71,31 @@ auto make_random_vector(std::array<DistributionType, VectorType::size> &distribu
     return vector;
 }
 
+namespace detail {
+
+template <typename CurrentIndex, typename VectorType>
+auto to_string_impl(const VectorType &vector, std::string &string, char delimiter) -> void {
+    using IndexTypeList = typename VectorType::IndexTypeList;
+
+    string.append(std::to_string(vector.template get<CurrentIndex>()));
+
+    if constexpr (wheel::has_next_type<CurrentIndex, IndexTypeList>) {
+        string.push_back(delimiter);
+        to_string_impl<wheel::next_type_t<CurrentIndex, IndexTypeList>>(vector, string, delimiter);
+    }
+}
+
+} // namespace detail
+
+template <typename VectorType>
+auto to_string(VectorType vector, char delimiter = ' ') -> std::string {
+    std::string string;
+
+    detail::to_string_impl<wheel::begin_type_t<typename VectorType::IndexTypeList>>(vector, string, delimiter);
+
+    return string;
+}
+
 } // namespace wheel
 
 #endif // LIBWHEEL_MOTION_PLANNING_VECTOR_HPP
