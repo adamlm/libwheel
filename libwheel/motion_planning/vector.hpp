@@ -101,6 +101,33 @@ auto to_string(VectorType vector, char delimiter = ' ') -> std::string {
     return string;
 }
 
+namespace detail {
+
+template <typename CurrentIndex, typename VectorType>
+auto euclidean_distance_impl(const VectorType &source, const VectorType &target) -> double {
+    using IndexTypeList = typename VectorType::IndexTypeList;
+
+    double result = std::abs(static_cast<double>(source.template get<CurrentIndex>()) -
+                             static_cast<double>(target.template get<CurrentIndex>()));
+    result = std::pow(result, 2);
+
+    if constexpr (wheel::has_next_type<CurrentIndex, IndexTypeList>) {
+        result += euclidean_distance_impl<wheel::next_type_t<CurrentIndex, IndexTypeList>>(source, target);
+    }
+
+    return result;
+}
+
+} // namespace detail
+
+template <typename VectorType>
+auto euclidean_distance(const VectorType &source, const VectorType &target) -> double {
+    const auto sum_of_squares =
+        detail::euclidean_distance_impl<wheel::begin_type_t<typename VectorType::IndexTypeList>>(source, target);
+
+    return std::sqrt(sum_of_squares);
+}
+
 } // namespace wheel
 
 #endif // LIBWHEEL_MOTION_PLANNING_VECTOR_HPP
