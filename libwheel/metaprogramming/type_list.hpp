@@ -187,6 +187,9 @@ template <typename StartType, typename TypeList>
     requires has_type_member<next_type<StartType, TypeList>>
 using next_type_t = typename next_type<StartType, TypeList>::type;
 
+template <typename StartType, typename TypeList>
+concept has_next_type = has_type_member<next_type<StartType, TypeList>>;
+
 } // namespace wheel
 
 #endif // LIBWHEEL_METAPROGRAMMING_TYPE_LIST_HPP
