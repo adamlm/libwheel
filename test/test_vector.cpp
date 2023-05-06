@@ -7,6 +7,7 @@ struct Y {};
 struct Z {};
 
 using TestVector = wheel::Vector<wheel::IndexTypeList<X, Y, Z>, wheel::StorageTypeList<int, int, int>>;
+using TestVectorFloat = wheel::Vector<wheel::IndexTypeList<X, Y, Z>, wheel::StorageTypeList<float, float, float>>;
 
 // Compile-time tests
 static_assert(TestVector::size == 3);
@@ -61,10 +62,33 @@ TEST(VectorTest, ToStringInt) {
 }
 
 TEST(VectorTest, ToStringFloat) {
-    using TestVectorFloat = wheel::Vector<wheel::IndexTypeList<X, Y, Z>, wheel::StorageTypeList<float, float, float>>;
-
     const TestVectorFloat vector{1.2F, 2.4444F, 3.0F};
     const auto string{wheel::to_string(vector)};
 
     EXPECT_STREQ(string.c_str(), "1.200000 2.444400 3.000000");
+}
+
+TEST(VectorTest, EuclideanDistanceOneAxis) {
+    const TestVector source{0, 0, 0};
+    const TestVector target_x{4, 0, 0};
+    const TestVector target_y{0, 5, 0};
+    const TestVector target_z{0, 0, 23};
+
+    EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target_x), 4.0);
+    EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target_y), 5.0);
+    EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target_z), 23.0);
+}
+
+TEST(VectorTest, EuclideanDistanceMultiAxis) {
+    const TestVectorFloat source{3.455F, -2.5006F, 20.77F};
+    const TestVectorFloat target{6.455F, -12.5006F, 0.77F};
+
+    EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target), 22.561028662388491);
+}
+
+TEST(VectorTest, EuclideanDistanceMultiAxisZero) {
+    const TestVectorFloat source{3.455F, -2.5006F, 20.77F};
+    const TestVectorFloat target{3.455F, -2.5006F, 20.77F};
+
+    EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target), 0.0);
 }
