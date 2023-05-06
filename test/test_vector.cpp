@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <gtest/gtest.h>
 
 #include <libwheel/motion_planning/vector.hpp>
@@ -91,4 +93,58 @@ TEST(VectorTest, EuclideanDistanceMultiAxisZero) {
     const TestVectorFloat target{3.455F, -2.5006F, 20.77F};
 
     EXPECT_DOUBLE_EQ(wheel::euclidean_distance(source, target), 0.0);
+}
+
+TEST(VectorTest, Addition) {
+    const TestVector lhs;
+    const TestVector rhs;
+    const auto result{lhs + rhs};
+
+    EXPECT_EQ(result, TestVector{});
+}
+
+TEST(VectorTest, Subtraction) {
+    const TestVector lhs;
+    const TestVector rhs;
+    const auto result{lhs - rhs};
+
+    EXPECT_EQ(result, TestVector{});
+}
+
+TEST(VectorTest, Multiplication) {
+    const int lhs{2};
+    const TestVector rhs;
+    const auto result{lhs * rhs};
+
+    EXPECT_EQ(result, TestVector{});
+}
+
+TEST(VectorTest, Division) {
+    const int lhs{2};
+    const TestVector rhs;
+    const auto result{rhs / lhs};
+
+    EXPECT_EQ(result, TestVector{});
+}
+
+TEST(VectorTest, Interpolate) {
+    const TestVectorFloat source{1.0F, 2.0F, 3.0F};
+    const TestVectorFloat target{4.0F, 5.0F, 6.0F};
+
+    const std::array<TestVectorFloat, 11U> expected_values{
+        TestVectorFloat{1.0F, 2.0F, 3.0F}, TestVectorFloat{1.3F, 2.3F, 3.3F}, TestVectorFloat{1.6F, 2.6F, 3.6F},
+        TestVectorFloat{1.9F, 2.9F, 3.9F}, TestVectorFloat{2.2F, 3.2F, 4.2F}, TestVectorFloat{2.5F, 3.5F, 4.5F},
+        TestVectorFloat{2.8F, 3.8F, 4.8F}, TestVectorFloat{3.1F, 4.1F, 5.1F}, TestVectorFloat{3.4F, 4.4F, 5.4F},
+        TestVectorFloat{3.7F, 4.7F, 5.7F}, TestVectorFloat{4.0F, 5.0F, 6.0F},
+    };
+
+    const auto results = wheel::interpolate(source, target, 11U);
+
+    EXPECT_EQ(std::size(results), 11U);
+
+    for (auto i{0U}; i < std::size(results); ++i) {
+        EXPECT_FLOAT_EQ(results[i].get<X>(), expected_values[i].get<X>());
+        EXPECT_FLOAT_EQ(results[i].get<Y>(), expected_values[i].get<Y>());
+        EXPECT_FLOAT_EQ(results[i].get<Z>(), expected_values[i].get<Z>());
+    }
 }
