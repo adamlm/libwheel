@@ -44,6 +44,8 @@ class Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>> {
     std::tuple<StorageTs...> data_;
 };
 
+namespace detail {
+
 template <typename CurrentIndex, typename VectorType>
 auto make_random_vector_impl(VectorType &vector, auto &engine, auto &distributions) -> void {
     using IndexTypeList = typename VectorType::IndexTypeList;
@@ -58,6 +60,8 @@ auto make_random_vector_impl(VectorType &vector, auto &engine, auto &distributio
     }
 }
 
+} // namespace detail
+
 template <std::default_initializable VectorType, typename DistributionType,
           typename RandomDeviceType = std::random_device, typename RandomEngineType = std::default_random_engine>
 auto make_random_vector(std::array<DistributionType, VectorType::size> &distributions) -> VectorType {
@@ -66,7 +70,8 @@ auto make_random_vector(std::array<DistributionType, VectorType::size> &distribu
     RandomDeviceType device;
     RandomEngineType engine{device()};
 
-    make_random_vector_impl<wheel::begin_type_t<typename VectorType::IndexTypeList>>(vector, engine, distributions);
+    detail::make_random_vector_impl<wheel::begin_type_t<typename VectorType::IndexTypeList>>(vector, engine,
+                                                                                             distributions);
 
     return vector;
 }
