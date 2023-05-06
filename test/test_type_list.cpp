@@ -19,3 +19,14 @@ static_assert(!wheel::has_value_member<wheel::index_of<unsigned int, wheel::Type
 static_assert(wheel::index_of_v<int, wheel::TypeList<int, char, float>> == 0U);
 static_assert(wheel::index_of_v<char, wheel::TypeList<int, char, float>> == 1U);
 static_assert(wheel::index_of_v<float, wheel::TypeList<int, char, float>> == 2U);
+
+// Compile-time tests for beginning type for a TypeList
+static_assert(std::is_same_v<wheel::begin_type<wheel::TypeList<int>>::type, int>);
+static_assert(std::is_same_v<wheel::begin_type<wheel::TypeList<float, int>>::type, float>);
+static_assert(std::is_same_v<wheel::begin_type<wheel::TypeList<float, float>>::type, float>);
+
+static_assert(!wheel::has_value_member<wheel::begin_type<wheel::TypeList<>>>);
+
+static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<int>>, int>);
+static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<float, int>>, float>);
+static_assert(std::is_same_v<wheel::begin_type_t<wheel::TypeList<float, float>>, float>);
