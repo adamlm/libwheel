@@ -6,20 +6,20 @@
 
 #include "libwheel/motion_planning/bound_range.hpp"
 
-namespace wheel
-{
+namespace wheel {
 
 /**
  * @brief Class representing a mathematical space (set with structure)
  *
  * @tparam SpaceVectorType Mathematical vector type associated with space
  */
-template <typename SpaceVectorType>
+template <typename VectorT>
 class Space {
-public:
-    using VectorType = SpaceVectorType;
+  public:
+    using VectorType = VectorT;
     using PathType = std::vector<VectorType>;
-    static constexpr auto kDimensions{VectorType::kDimensions};
+
+    static constexpr auto size{VectorType::size};
 
     /**
      * @brief Construct a new Space object
@@ -35,15 +35,12 @@ public:
      *
      * @return const std::array<wheel::BoundRange, kDimensions>& Immutable reference to the space's bound ranges
      */
-    auto getBoundRanges() const -> const std::array<wheel::BoundRange, kDimensions>& {
-        return bound_ranges_;
-    }
+    auto getBoundRanges() const -> const std::array<wheel::BoundRange, size> & { return bound_ranges_; }
 
-private:
-    std::array<BoundRange, kDimensions> bound_ranges_;
+  private:
+    std::array<BoundRange, size> bound_ranges_;
 };
 
 } // namespace wheel
-
 
 #endif // LIBWHEEL_MOTION_PLANNING_SPACE_HPP

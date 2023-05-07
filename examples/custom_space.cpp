@@ -1,15 +1,16 @@
 #include <array>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include <libwheel/motion_planning/uniform_sampler.hpp>
-#include <libwheel/motion_planning/space.hpp>
 #include <libwheel/motion_planning/bound_range.hpp>
+#include <libwheel/motion_planning/space.hpp>
+#include <libwheel/motion_planning/uniform_sampler.hpp>
 
 struct CustomVector {
     static constexpr auto kDimensions{3};
+    static constexpr auto size{3U};
 
-    static auto fromArray(const std::array<double, kDimensions>& values) -> CustomVector {
+    static auto fromArray(const std::array<double, kDimensions> &values) -> CustomVector {
         return CustomVector{
             std::get<0>(values),
             std::get<1>(values),
@@ -25,11 +26,9 @@ struct CustomVector {
 using CustomSpace = wheel::Space<CustomVector>;
 
 int main() {
-    CustomSpace space{
-        wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
-        wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}},
-        wheel::BoundRange{wheel::LowerBound{20.0}, wheel::UpperBound{30.0}}
-    };
+    CustomSpace space{wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
+                      wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}},
+                      wheel::BoundRange{wheel::LowerBound{20.0}, wheel::UpperBound{30.0}}};
 
     wheel::UniformSampler sampler{space};
 

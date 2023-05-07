@@ -15,6 +15,7 @@ namespace wheel {
  */
 struct R2Vector {
     static constexpr auto kDimensions{2};
+    static constexpr auto size{2U};
 
     /**
      * @brief Create an R2Vector from a std::array
