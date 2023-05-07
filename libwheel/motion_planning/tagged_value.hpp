@@ -17,7 +17,6 @@ namespace wheel {
 template <typename StorageType, typename Tag>
 class TaggedValue {
   public:
-
     /**
      * @brief Construct a new TaggedValue object
      *
