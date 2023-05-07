@@ -31,12 +31,14 @@ class Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>> {
     explicit Vector(StorageTs... elements) : data_{elements...} {}
 
     template <typename IndexType>
-    [[nodiscard]] auto get() const -> decltype(auto) {
+    [[nodiscard]]
+    auto get() const -> decltype(auto) {
         return std::get<wheel::index_of_v<IndexType, wheel::TypeList<IndexTs...>>>(data_);
     }
 
     template <typename IndexType>
-    [[nodiscard]] auto get() -> decltype(auto) {
+    [[nodiscard]]
+    auto get() -> decltype(auto) {
         return std::get<wheel::index_of_v<IndexType, wheel::TypeList<IndexTs...>>>(data_);
     }
 
