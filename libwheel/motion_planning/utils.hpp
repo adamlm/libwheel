@@ -7,9 +7,9 @@ namespace wheel {
 
 template <typename PathType>
 auto printPathNodes(const PathType &path, std::ostream &stream = std::cout) {
-    using VectorType = typename PathType::value_type;
-    for (const auto& config : path) {
-        stream << VectorType::toString(config) << '\n';
+    for (const auto &config : path) {
+        using namespace wheel;
+        stream << to_string(config) << '\n';
     }
 }
 

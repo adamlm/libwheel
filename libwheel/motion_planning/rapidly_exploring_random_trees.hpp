@@ -21,7 +21,8 @@ auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typen
     auto nearest_distance{std::numeric_limits<double>::max()};
 
     for (auto [it, end] = boost::vertices(graph); it < end - 1; ++it) {
-        const auto distance{VectorType::distance(graph[*it].config, target)};
+        using namespace wheel;
+        const auto distance{euclidean_distance(graph[*it].config, target)};
         if (distance < nearest_distance) {
             nearest_vertex = *it;
             nearest_distance = distance;
@@ -37,7 +38,8 @@ auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples)
         const auto sampled_config = sampler.nextSample();
 
         auto nearest_vertex = nearestElementTo(graph, sampled_config);
-        const auto configs = SamplerType::VectorType::interpolate(graph[nearest_vertex].config, sampled_config, 100);
+        using namespace wheel;
+        const auto configs = interpolate(graph[nearest_vertex].config, sampled_config, 100);
 
         for (const auto config : configs) {
             const auto vertex = boost::add_vertex(typename boost::vertex_bundle_type<GraphType>::type{config}, graph);
@@ -54,7 +56,8 @@ auto pathExists(const GraphType &graph, const VectorType &target) -> bool {
     double min_dist = std::numeric_limits<double>::max();
 
     for (auto [vertex, end] = boost::vertices(graph); vertex != end; ++vertex) {
-        if (const auto dist = VectorType::distance(graph[*vertex].config, target); dist < 1.0) {
+        using namespace wheel;
+        if (const auto dist = euclidean_distance(graph[*vertex].config, target); dist < 1.0) {
             return true;
         } else {
             min_dist = std::min(min_dist, dist);
