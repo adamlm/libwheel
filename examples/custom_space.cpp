@@ -6,22 +6,11 @@
 #include <libwheel/motion_planning/space.hpp>
 #include <libwheel/motion_planning/uniform_sampler.hpp>
 
-struct CustomVector {
-    static constexpr auto kDimensions{3};
-    static constexpr auto size{3U};
+struct Foo {};
+struct Bar {};
+struct Baz {};
 
-    static auto fromArray(const std::array<double, kDimensions> &values) -> CustomVector {
-        return CustomVector{
-            std::get<0>(values),
-            std::get<1>(values),
-            std::get<2>(values),
-        };
-    }
-
-    double foo;
-    double bar;
-    double baz;
-};
+using CustomVector = wheel::Vector<wheel::IndexTypeList<Foo, Bar, Baz>, wheel::StorageTypeList<double, double, double>>;
 
 using CustomSpace = wheel::Space<CustomVector>;
 
@@ -34,7 +23,7 @@ int main() {
 
     for (auto i{0}; i < 20; ++i) {
         const auto sample{sampler.nextSample()};
-        std::cout << sample.foo << ' ' << sample.bar << ' ' << sample.baz << '\n';
+        std::cout << wheel::to_string(sample) << '\n';
     }
 
     return 0;
