@@ -1,8 +1,8 @@
 #ifndef LIBWHEEL_MOTION_PLANNING_UNIFORM_SAMPLER_HPP
 #define LIBWHEEL_MOTION_PLANNING_UNIFORM_SAMPLER_HPP
 
-#include <array>
 #include <algorithm>
+#include <array>
 
 #include "libwheel/motion_planning/sampler_base.hpp"
 
@@ -24,7 +24,7 @@ class UniformSampler : public SamplerBase {
      *
      * @param space Space to be sampled
      */
-    explicit UniformSampler(const SpaceType& space) {
+    explicit UniformSampler(const SpaceType &space) {
         static constexpr auto make_distribution = [](const auto &range) {
             return std::uniform_real_distribution<>{range.lower.get(), range.upper.get()};
         };
@@ -38,7 +38,7 @@ class UniformSampler : public SamplerBase {
      * @return VectorType Mathematical vector contained within the space
      */
     auto nextSample() -> VectorType {
-        std::array<double, SpaceType::kDimensions> sampled_values;
+        std::array<double, SpaceType::size> sampled_values;
 
         for (auto i{0U}; i < std::size(sampled_values); ++i) {
             sampled_values.at(i) = distributions_.at(i)(generator_);
@@ -48,7 +48,7 @@ class UniformSampler : public SamplerBase {
     }
 
   private:
-    std::array<std::uniform_real_distribution<>, SpaceType::kDimensions> distributions_;
+    std::array<std::uniform_real_distribution<>, SpaceType::size> distributions_;
 };
 
 } // namespace wheel
