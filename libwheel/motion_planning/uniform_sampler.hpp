@@ -5,6 +5,7 @@
 #include <array>
 
 #include "libwheel/motion_planning/sampler_base.hpp"
+#include "libwheel/motion_planning/vector.hpp"
 
 namespace wheel {
 
@@ -37,15 +38,7 @@ class UniformSampler : public SamplerBase {
      *
      * @return VectorType Mathematical vector contained within the space
      */
-    auto nextSample() -> VectorType {
-        std::array<double, SpaceType::size> sampled_values;
-
-        for (auto i{0U}; i < std::size(sampled_values); ++i) {
-            sampled_values.at(i) = distributions_.at(i)(generator_);
-        }
-
-        return VectorType::fromArray(sampled_values);
-    }
+    auto nextSample() -> VectorType { return make_random_vector<VectorType>(distributions_); }
 
   private:
     std::array<std::uniform_real_distribution<>, SpaceType::size> distributions_;
