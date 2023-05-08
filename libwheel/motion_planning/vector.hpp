@@ -15,12 +15,32 @@ using IndexTypeList = typename wheel::TypeList<IndexTypes...>;
 template <typename... StorageTypes>
 using StorageTypeList = typename wheel::TypeList<StorageTypes...>;
 
+template <typename VectorType>
+struct ExactEqualityComparison;
+
+template <typename VectorType>
+struct VectorAddition;
+
+template <typename VectorType>
+struct VectorSubtraction;
+
+template <typename VectorType>
+struct ScalarMultiplication;
+
+template <typename VectorType>
+struct ScalarDivision;
+
 template <typename, typename>
 class Vector;
 
 template <typename... IndexTs, typename... StorageTs>
     requires(sizeof...(IndexTs) == sizeof...(StorageTs))
-class Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>> {
+class Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>
+    : public ExactEqualityComparison<Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>>,
+      VectorAddition<Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>>,
+      VectorSubtraction<Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>>,
+      ScalarMultiplication<Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>>,
+      ScalarDivision<Vector<IndexTypeList<IndexTs...>, StorageTypeList<StorageTs...>>> {
   public:
     using IndexTypeList = wheel::TypeList<IndexTs...>;
     using StorageTypeList = wheel::TypeList<StorageTs...>;
@@ -127,64 +147,75 @@ auto apply_comparison(const VectorType &lhs, const VectorType &rhs) -> bool {
 }
 
 template <typename VectorType>
-auto operator==(const VectorType &lhs, const VectorType &rhs) -> bool {
-    return apply_comparison<VectorType, std::equal_to>(lhs, rhs);
-}
+struct VectorAddition {
+    friend auto operator+=(VectorType &lhs, const VectorType &rhs) -> VectorType & {
+        lhs = apply_binary_function<VectorType, std::plus>(lhs, rhs);
+
+        return lhs;
+    }
+
+    friend auto operator+(VectorType lhs, const VectorType &rhs) -> VectorType { return lhs += rhs; }
+};
 
 template <typename VectorType>
-auto operator+=(VectorType &lhs, const VectorType &rhs) -> VectorType & {
-    lhs = apply_binary_function<VectorType, std::plus>(lhs, rhs);
+struct VectorSubtraction {
+    friend auto operator-=(VectorType &lhs, const VectorType &rhs) -> VectorType & {
+        lhs = apply_binary_function<VectorType, std::minus>(lhs, rhs);
 
-    return lhs;
-}
+        return lhs;
+    }
 
-template <typename VectorType>
-auto operator-=(VectorType &lhs, const VectorType &rhs) -> VectorType & {
-    lhs = apply_binary_function<VectorType, std::minus>(lhs, rhs);
-
-    return lhs;
-}
-
-template <typename ScalarType, typename VectorType>
-auto operator*=(VectorType &lhs, ScalarType rhs) -> VectorType & {
-    lhs = apply_binary_function<VectorType, ScalarType, std::multiplies>(lhs, rhs);
-
-    return lhs;
-}
-
-template <typename ScalarType, typename VectorType>
-auto operator/=(VectorType &lhs, ScalarType rhs) -> VectorType & {
-    lhs = apply_binary_function<VectorType, ScalarType, std::divides>(lhs, rhs);
-
-    return lhs;
-}
+    friend auto operator-(VectorType lhs, const VectorType &rhs) -> VectorType { return lhs -= rhs; }
+};
 
 template <typename VectorType>
-auto operator+(VectorType lhs, const VectorType &rhs) -> VectorType {
-    return lhs += rhs;
-}
+struct ExactEqualityComparison {
+    friend auto operator==(const VectorType &lhs, const VectorType &rhs) -> bool {
+        return apply_comparison<VectorType, std::equal_to>(lhs, rhs);
+    }
+
+    friend auto operator!=(const VectorType &lhs, const VectorType &rhs) -> bool { return !(lhs == rhs); }
+};
 
 template <typename VectorType>
-auto operator-(VectorType lhs, const VectorType &rhs) -> VectorType {
-    return lhs -= rhs;
-}
+struct ScalarMultiplication {
+    template <typename ScalarType>
+        requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
+    friend auto operator*=(VectorType &lhs, ScalarType rhs) -> VectorType & {
+        lhs = apply_binary_function<VectorType, ScalarType, std::multiplies>(lhs, rhs);
 
-template <typename ScalarType, typename VectorType>
-auto operator*(ScalarType lhs, VectorType rhs) -> VectorType {
-    return rhs *= lhs;
-}
+        return lhs;
+    }
 
-template <typename ScalarType, typename VectorType>
-    requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
-auto operator*(VectorType lhs, ScalarType rhs) -> VectorType {
-    return lhs *= rhs;
-}
+    template <typename ScalarType>
+        requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
+    friend auto operator*(ScalarType lhs, VectorType rhs) -> VectorType {
+        return rhs *= lhs;
+    }
 
-template <typename ScalarType, typename VectorType>
-    requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
-auto operator/(VectorType lhs, ScalarType rhs) -> VectorType {
-    return lhs /= rhs;
-}
+    template <typename ScalarType>
+        requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
+    friend auto operator*(VectorType lhs, ScalarType rhs) -> VectorType {
+        return lhs *= rhs;
+    }
+};
+
+template <typename VectorType>
+struct ScalarDivision {
+    template <typename ScalarType>
+        requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
+    friend auto operator/=(VectorType &lhs, ScalarType rhs) -> VectorType & {
+        lhs = apply_binary_function<VectorType, ScalarType, std::divides>(lhs, rhs);
+
+        return lhs;
+    }
+
+    template <typename ScalarType>
+        requires(std::integral<ScalarType> or std::floating_point<ScalarType>)
+    friend auto operator/(VectorType lhs, ScalarType rhs) -> VectorType {
+        return lhs /= rhs;
+    }
+};
 
 namespace detail {
 
