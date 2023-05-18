@@ -8,3 +8,22 @@ target_link_libraries(test_metaprogramming
   PRIVATE
     libwheel::metaprogramming
 )
+
+target_compile_options(test_metaprogramming
+  PRIVATE
+    -Wall
+    -Wextra
+    -Wshadow
+    -Wnon-virtual-dtor
+    -Wpedantic
+    -Wold-style-cast
+    -Wunused
+    -Wconversion
+    -Wsign-conversion
+    -Wcast-align
+    -Woverloaded-virtual
+    -Wdouble-promotion
+    -Wformat=2
+    -Wimplicit-fallthrough
+    -Werror
+)
