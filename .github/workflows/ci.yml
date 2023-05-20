@@ -15,7 +15,7 @@ jobs:
           - macos-latest
           - windows-latest
         compiler:
-          - llvm
+          - llvm-14
           - gcc
         build_type:
           - Release
