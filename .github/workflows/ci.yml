@@ -38,11 +38,10 @@ jobs:
           compiler: ${{ matrix.compiler }}
           cmake: true
           ninja: true
+          conan: true
 
       - name: Setup Conan
         run: |
-          python3 -m pip install conan
-          conan profile detect --force
           conan install . --output-folder=build --build=missing
 
       - name: Build and Test
