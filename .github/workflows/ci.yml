@@ -38,6 +38,7 @@ jobs:
           compiler: ${{ matrix.compiler }}
           cmake: true
           ninja: true
+          make: true
           conan: true
 
       - name: Setup Conan
