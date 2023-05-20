@@ -1,0 +1,40 @@
+name: CI
+on:
+  pull_requests:
+  push:
+    branches:
+      - main
+
+jobs:
+  CTest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        compiler:
+          - llvm
+          - gcc
+        build_type:
+          - Release
+          - Debug
+        include:
+          - os: windows-latest
+            compiler: msvc
+        exclude:
+          - os: windows-latest
+            compiler: gcc
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup C++
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          cmake: true
+          ninja: true
