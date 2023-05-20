@@ -41,7 +41,7 @@ auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples)
         using namespace wheel;
         const auto configs = interpolate(graph[nearest_vertex].config, sampled_config, 100);
 
-        for (const auto config : configs) {
+        for (const auto &config : configs) {
             const auto vertex = boost::add_vertex(typename boost::vertex_bundle_type<GraphType>::type{config}, graph);
             boost::add_edge(nearest_vertex, vertex, graph);
 

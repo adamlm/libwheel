@@ -39,20 +39,16 @@ TEST(VectorTest, ElementModification) {
 }
 
 TEST(VectorTest, MakeRandomVector) {
-    struct FixedSeedDevice {
-        auto operator()() -> unsigned int { return 42; }
-    };
-
     using DistributionType = std::uniform_int_distribution<>;
 
-    std::array<DistributionType, TestVector::size> distributions{DistributionType{0, 2}, DistributionType{0, 2},
-                                                                 DistributionType{0, 2}};
+    std::array<DistributionType, TestVector::size> distributions{DistributionType{0, 0}, DistributionType{1, 1},
+                                                                 DistributionType{2, 2}};
 
-    const auto vector{wheel::make_random_vector<TestVector, DistributionType, FixedSeedDevice>(distributions)};
+    const auto vector{wheel::make_random_vector<TestVector, DistributionType>(distributions)};
 
-    EXPECT_EQ(vector.get<X>(), 1);
-    EXPECT_EQ(vector.get<Y>(), 2);
-    EXPECT_EQ(vector.get<Z>(), 0);
+    EXPECT_EQ(vector.get<X>(), 0);
+    EXPECT_EQ(vector.get<Y>(), 1);
+    EXPECT_EQ(vector.get<Z>(), 2);
 }
 
 TEST(VectorTest, ToStringInt) {
