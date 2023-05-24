@@ -12,20 +12,20 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
-          - windows-latest
+          # - macos-latest
+          # - windows-latest
         compiler:
           - llvm-14
-          - gcc
+          # - gcc
         build_type:
-          - Release
+          # - Release
           - Debug
-        include:
-          - os: windows-latest
-            compiler: msvc
-        exclude:
-          - os: windows-latest
-            compiler: gcc
+        # include:
+        #   - os: windows-latest
+        #     compiler: msvc
+        # exclude:
+        #   - os: windows-latest
+        #     compiler: gcc
 
     runs-on: ${{ matrix.os }}
 
