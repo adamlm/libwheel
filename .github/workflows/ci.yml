@@ -54,6 +54,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt update
           sudo apt install -y libboost1.74-dev libgtest-dev
 
       - name: Build and Test
