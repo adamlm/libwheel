@@ -41,24 +41,24 @@ jobs:
           make: true
           conan: true
 
-      # - name: Setup Conan
-      #   run: |
-      #     conan install . --output-folder=build --build=missing
-
-      # - name: Build and Test
-      #   run: |
-      #     cmake -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
-      #     cmake --build build
-      #     cd build
-      #     ctest
-
-      - name: Install dependencies
+      - name: Setup Conan
         run: |
-          sudo apt install -y libboost1.74-dev libgtest-dev
+          conan install . --output-folder=build --build=missing
 
       - name: Build and Test
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+          cmake -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
           cmake --build build
           cd build
           ctest
+
+      # - name: Install dependencies
+      #   run: |
+      #     sudo apt install -y libboost1.74-dev libgtest-dev
+
+      # - name: Build and Test
+      #   run: |
+      #     cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+      #     cmake --build build
+      #     cd build
+      #     ctest
