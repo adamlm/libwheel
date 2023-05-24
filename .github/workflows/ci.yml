@@ -41,9 +41,20 @@ jobs:
           make: true
           conan: true
 
-      - name: Setup Conan
+      # - name: Setup Conan
+      #   run: |
+      #     conan install . --output-folder=build --build=missing
+
+      # - name: Build and Test
+      #   run: |
+      #     cmake -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+      #     cmake --build build
+      #     cd build
+      #     ctest
+
+      - name: Install dependencies
         run: |
-          conan install . --output-folder=build --build=missing
+          sudo apt install -y libboost1.74-dev gtest
 
       - name: Build and Test
         run: |
