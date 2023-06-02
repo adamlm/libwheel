@@ -13,6 +13,9 @@ using ColIdxList = wheel::TypeList<IdxX, IdxY, IdxZ>;
 using TestMatrix = wheel::StronglyTypedMatrix<double, RowIdxList, ColIdxList, struct TestMatrixTag>;
 using TestVector = wheel::StronglyTypedVector<double, RowIdxList, struct TestVectorTag>;
 
+static_assert(TestMatrix::size == 9U);
+static_assert(TestVector::size == 3U);
+
 TEST(TestStronglyTypedMatrix, MutableElementAccess) {
     TestMatrix matrix{wheel::wrap_raw_value<IdxX, IdxX>(1.0), wheel::wrap_raw_value<IdxX, IdxY>(2.0),
                       wheel::wrap_raw_value<IdxX, IdxZ>(3.0), wheel::wrap_raw_value<IdxY, IdxX>(4.0),
