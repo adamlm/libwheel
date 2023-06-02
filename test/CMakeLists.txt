@@ -1,5 +1,6 @@
 add_executable(strongly_typed_matrix_tests
   test_strongly_typed_matrix.cpp
+  test_strongly_typed_coefficient.cpp
 )
 
 target_link_libraries(strongly_typed_matrix_tests
