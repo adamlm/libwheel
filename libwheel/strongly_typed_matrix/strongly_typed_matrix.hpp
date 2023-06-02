@@ -57,6 +57,9 @@ template <typename ScalarType, typename RowIdxList, typename ColIdxList, typenam
 class StronglyTypedMatrix {
   public:
     using raw_matrix_type = Eigen::Matrix<ScalarType, RowIdxList::size, ColIdxList::size>;
+    using size_type = std::size_t;
+
+    static constexpr size_type size{raw_matrix_type::SizeAtCompileTime};
 
     StronglyTypedMatrix() : raw_matrix_(raw_matrix_type::Zero()) {}
 
