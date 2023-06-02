@@ -117,12 +117,6 @@ class StronglyTypedMatrix {
     raw_matrix_type raw_matrix_;
 };
 
-namespace detail {
-
-struct NoIdxType {};
-
-} // namespace detail
-
 /**
  * @brief A strongly-typed column vector
  *
@@ -131,7 +125,7 @@ struct NoIdxType {};
  * @tparam SemanticTag A tag `struct` to indicate vector's semantic purpose
  */
 template <typename ScalarType, typename RowIdxList, typename SemanticTag>
-using StronglyTypedVector = StronglyTypedMatrix<ScalarType, RowIdxList, TypeList<detail::NoIdxType>, SemanticTag>;
+using StronglyTypedVector = StronglyTypedMatrix<ScalarType, RowIdxList, TypeList<NoIdxType>, SemanticTag>;
 
 } // namespace wheel
 
