@@ -4,7 +4,7 @@
 #include <libwheel/motion_planning/bound_range.hpp>
 #include <libwheel/motion_planning/r2_space.hpp>
 #include <libwheel/motion_planning/rapidly_exploring_random_trees.hpp>
-#include <libwheel/motion_planning/uniform_sampler.hpp>
+#include <libwheel/motion_planning/sampler.hpp>
 #include <libwheel/motion_planning/utils.hpp>
 
 auto main() -> int {
