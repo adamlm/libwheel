@@ -14,7 +14,11 @@ using TestMatrix = wheel::StronglyTypedMatrix<double, RowIdxList, ColIdxList, st
 using TestVector = wheel::StronglyTypedVector<double, RowIdxList, struct TestVectorTag>;
 
 TEST(TestStronglyTypedMatrix, MutableElementAccess) {
-    TestMatrix matrix{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    TestMatrix matrix{wheel::wrap_raw_value<IdxX, IdxX>(1.0), wheel::wrap_raw_value<IdxX, IdxY>(2.0),
+                      wheel::wrap_raw_value<IdxX, IdxZ>(3.0), wheel::wrap_raw_value<IdxY, IdxX>(4.0),
+                      wheel::wrap_raw_value<IdxY, IdxY>(5.0), wheel::wrap_raw_value<IdxY, IdxZ>(6.0),
+                      wheel::wrap_raw_value<IdxZ, IdxX>(7.0), wheel::wrap_raw_value<IdxZ, IdxY>(8.0),
+                      wheel::wrap_raw_value<IdxZ, IdxZ>(9.0)};
 
     EXPECT_DOUBLE_EQ((matrix.at<IdxX, IdxX>()), 1.0);
     matrix.at<IdxX, IdxX>() = 10.0;
@@ -26,14 +30,22 @@ TEST(TestStronglyTypedMatrix, MutableElementAccess) {
 }
 
 TEST(TestStronglyTypedMatrix, ConstElementAccess) {
-    const TestMatrix matrix{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    const TestMatrix matrix{wheel::wrap_raw_value<IdxX, IdxX>(1.0), wheel::wrap_raw_value<IdxX, IdxY>(2.0),
+                            wheel::wrap_raw_value<IdxX, IdxZ>(3.0), wheel::wrap_raw_value<IdxY, IdxX>(4.0),
+                            wheel::wrap_raw_value<IdxY, IdxY>(5.0), wheel::wrap_raw_value<IdxY, IdxZ>(6.0),
+                            wheel::wrap_raw_value<IdxZ, IdxX>(7.0), wheel::wrap_raw_value<IdxZ, IdxY>(8.0),
+                            wheel::wrap_raw_value<IdxZ, IdxZ>(9.0)};
 
     EXPECT_DOUBLE_EQ((matrix.at<IdxX, IdxX>()), 1.0);
     EXPECT_DOUBLE_EQ((matrix.at<IdxZ, IdxZ>()), 9.0);
 }
 
 TEST(TestStronglyTypedMatrix, MutableRawMatrixAccess) {
-    TestMatrix matrix{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    TestMatrix matrix{wheel::wrap_raw_value<IdxX, IdxX>(1.0), wheel::wrap_raw_value<IdxX, IdxY>(2.0),
+                      wheel::wrap_raw_value<IdxX, IdxZ>(3.0), wheel::wrap_raw_value<IdxY, IdxX>(4.0),
+                      wheel::wrap_raw_value<IdxY, IdxY>(5.0), wheel::wrap_raw_value<IdxY, IdxZ>(6.0),
+                      wheel::wrap_raw_value<IdxZ, IdxX>(7.0), wheel::wrap_raw_value<IdxZ, IdxY>(8.0),
+                      wheel::wrap_raw_value<IdxZ, IdxZ>(9.0)};
     auto &raw_matrix{matrix.raw_matrix()};
 
     EXPECT_DOUBLE_EQ(raw_matrix(0, 0), 1.0);
@@ -48,7 +60,11 @@ TEST(TestStronglyTypedMatrix, MutableRawMatrixAccess) {
 }
 
 TEST(TestStronglyTypedMatrix, ConstRawMatrixAccess) {
-    const TestMatrix matrix{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    const TestMatrix matrix{wheel::wrap_raw_value<IdxX, IdxX>(1.0), wheel::wrap_raw_value<IdxX, IdxY>(2.0),
+                            wheel::wrap_raw_value<IdxX, IdxZ>(3.0), wheel::wrap_raw_value<IdxY, IdxX>(4.0),
+                            wheel::wrap_raw_value<IdxY, IdxY>(5.0), wheel::wrap_raw_value<IdxY, IdxZ>(6.0),
+                            wheel::wrap_raw_value<IdxZ, IdxX>(7.0), wheel::wrap_raw_value<IdxZ, IdxY>(8.0),
+                            wheel::wrap_raw_value<IdxZ, IdxZ>(9.0)};
     const auto &raw_matrix{matrix.raw_matrix()};
 
     EXPECT_DOUBLE_EQ(raw_matrix(0, 0), 1.0);
@@ -56,7 +72,8 @@ TEST(TestStronglyTypedMatrix, ConstRawMatrixAccess) {
 }
 
 TEST(TestStronglyTypedVector, MutableElementAccess) {
-    TestVector vector{1.0, 2.0, 3.0};
+    TestVector vector{wheel::wrap_raw_value<IdxX>(1.0), wheel::wrap_raw_value<IdxY>(2.0),
+                      wheel::wrap_raw_value<IdxZ>(3.0)};
 
     EXPECT_DOUBLE_EQ((vector.at<IdxX>()), 1.0);
     vector.at<IdxX>() = 10.0;
@@ -68,14 +85,16 @@ TEST(TestStronglyTypedVector, MutableElementAccess) {
 }
 
 TEST(TestStronglyTypedVector, ConstElementAccess) {
-    const TestVector vector{1.0, 2.0, 3.0};
+    const TestVector vector{wheel::wrap_raw_value<IdxX>(1.0), wheel::wrap_raw_value<IdxY>(2.0),
+                            wheel::wrap_raw_value<IdxZ>(3.0)};
 
     EXPECT_DOUBLE_EQ((vector.at<IdxX>()), 1.0);
     EXPECT_DOUBLE_EQ((vector.at<IdxZ>()), 3.0);
 }
 
 TEST(TestStronglyTypedVector, MutableRawMatrixAccess) {
-    TestVector vector{1.0, 2.0, 3.0};
+    TestVector vector{wheel::wrap_raw_value<IdxX>(1.0), wheel::wrap_raw_value<IdxY>(2.0),
+                      wheel::wrap_raw_value<IdxZ>(3.0)};
     auto &raw_vector{vector.raw_matrix()};
 
     EXPECT_DOUBLE_EQ(raw_vector(0), 1.0);
@@ -90,7 +109,8 @@ TEST(TestStronglyTypedVector, MutableRawMatrixAccess) {
 }
 
 TEST(TestStronglyTypedVector, ConstRawMatrixAccess) {
-    const TestVector vector{1.0, 2.0, 3.0};
+    const TestVector vector{wheel::wrap_raw_value<IdxX>(1.0), wheel::wrap_raw_value<IdxY>(2.0),
+                            wheel::wrap_raw_value<IdxZ>(3.0)};
     const auto &raw_vector{vector.raw_matrix()};
 
     EXPECT_DOUBLE_EQ(raw_vector(0), 1.0);
