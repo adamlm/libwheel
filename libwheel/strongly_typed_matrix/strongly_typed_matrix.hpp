@@ -1,15 +1,48 @@
 #ifndef LIBWHEEL_STRONGLY_TYPED_MATRIX_STRONGLY_TYPED_MATRIX_HPP
 #define LIBWHEEL_STRONGLY_TYPED_MATRIX_STRONGLY_TYPED_MATRIX_HPP
 
-// Standard library includes
+// Standard library headers
 #include <concepts>
 #include <type_traits>
 
-// Third-party includes
+// Third-party headers
 #include <Eigen/Dense>
 #include <libwheel/metaprogramming/type_list.hpp>
 
+// Local library headers
+#include "index_types.hpp"
+#include "strongly_typed_coefficient.hpp"
+
 namespace wheel {
+
+namespace detail {
+
+template <typename RowIdxList, typename ColIdxList, typename... Coefficients>
+concept compatible_coefficient_count = sizeof...(Coefficients) == (RowIdxList::size * ColIdxList::size);
+
+template <typename RowIdxList, typename ColIdxList, std::size_t index, typename Coefficient, typename... Coefficients>
+constexpr auto are_coefficient_types_compatible() -> bool {
+    constexpr auto expected_row_index = index / ColIdxList::size;
+    constexpr auto actual_row_index = index_of_v<typename Coefficient::row_index_type, RowIdxList>;
+
+    constexpr auto expected_col_index = index % ColIdxList::size;
+    constexpr auto actual_col_index = index_of_v<typename Coefficient::column_index_type, ColIdxList>;
+
+    constexpr auto is_current_coeff_compatible =
+        expected_row_index == actual_row_index && expected_col_index == actual_col_index;
+
+    if constexpr (index < RowIdxList::size * ColIdxList::size - 1) {
+        return is_current_coeff_compatible &&
+               are_coefficient_types_compatible<RowIdxList, ColIdxList, index + 1, Coefficients...>();
+    }
+
+    return is_current_coeff_compatible;
+}
+
+template <typename RowIdxList, typename ColIdxList, typename... Coefficients>
+concept compatible_coefficient_types = are_coefficient_types_compatible<RowIdxList, ColIdxList, 0, Coefficients...>();
+
+} // namespace detail
 
 /**
  * @brief A strongly-typed wrapper around a matrix type
@@ -25,9 +58,13 @@ class StronglyTypedMatrix {
   public:
     using raw_matrix_type = Eigen::Matrix<ScalarType, RowIdxList::size, ColIdxList::size>;
 
+    StronglyTypedMatrix() : raw_matrix_(raw_matrix_type::Zero()) {}
+
     template <typename... ScalarTs>
+        requires detail::compatible_coefficient_count<RowIdxList, ColIdxList, ScalarTs...> &&
+                 detail::compatible_coefficient_types<RowIdxList, ColIdxList, ScalarTs...>
     StronglyTypedMatrix(ScalarTs... scalars) {
-        std::array<ScalarType, RowIdxList::size * ColIdxList::size> buffer{scalars...};
+        std::array<ScalarType, RowIdxList::size * ColIdxList::size> buffer{scalars.raw_value()...};
 
         if constexpr (RowIdxList::size == 1 || ColIdxList::size == 1) {
             raw_matrix_ = Eigen::Map<raw_matrix_type>(buffer.data());
