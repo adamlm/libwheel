@@ -29,7 +29,7 @@ int main() {
     wheel::UniformSampler sampler{space};
 
     for (auto i{0}; i < 20; ++i) {
-        const auto sample{sampler.nextSample()};
+        const auto sample{sampler.next_sample()};
         std::cout << wheel::to_string(sample) << '\n';
     }
 
