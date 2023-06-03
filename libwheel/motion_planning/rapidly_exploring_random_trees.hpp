@@ -35,7 +35,7 @@ auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typen
 template <typename GraphType, typename SamplerType>
 auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples) -> void {
     for (auto i{0U}; i < num_samples; ++i) {
-        const auto sampled_config = sampler.nextSample();
+        const auto sampled_config = sampler.next_sample();
 
         auto nearest_vertex = nearestElementTo(graph, sampled_config);
         using namespace wheel;
@@ -99,12 +99,12 @@ auto findPath(const GraphType &graph, const VertexType &source, const VertexType
 } // namespace detail
 
 template <typename SamplerType>
-auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &source,
-                 const typename SamplerType::VectorType target, std::size_t max_samples = 1000U)
-    -> std::optional<typename SamplerType::SpaceType::PathType> {
+auto findRrtPath(SamplerType &sampler, const typename SamplerType::vector_type &source,
+                 const typename SamplerType::vector_type target, std::size_t max_samples = 1000U)
+    -> std::optional<typename SamplerType::space_type::PathType> {
 
     struct VertexProperties {
-        typename SamplerType::VectorType config;
+        typename SamplerType::vector_type config;
     };
 
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperties>;
@@ -125,7 +125,7 @@ auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &s
 
             const auto vertices = detail::findPath(graph, source_vertex, target_vertex);
             if (vertices) {
-                typename SamplerType::SpaceType::PathType path;
+                typename SamplerType::space_type::PathType path;
                 path.reserve(std::size(vertices.value()));
                 std::ranges::transform(vertices.value(), std::back_inserter(path),
                                        [&graph](const auto &vertex) { return graph[vertex].config; });

@@ -11,14 +11,13 @@ namespace wheel {
 template <typename VectorType, typename ScalarType, std::size_t Size>
 auto array_to_vector_type(const std::array<ScalarType, Size> &, VectorType &) -> void;
 
-template <typename SpaceT, typename DistributionType>
+template <typename SpaceType, typename DistributionType, std::size_t max_samples = 100U>
 class Sampler {
   public:
-    using vector_type = typename SpaceT::VectorType;
-    using SpaceType = SpaceT;
-    using VectorType = vector_type;
+    using space_type = SpaceType;
+    using vector_type = typename space_type::VectorType;
 
-    explicit Sampler(const SpaceType &space) : generator_{random_device_()} {
+    explicit Sampler(space_type space) : generator_{random_device_()} {
         static constexpr auto make_distribution = [](const auto &bound_range) {
             return std::uniform_real_distribution<>{bound_range.lower.get(), bound_range.upper.get()};
         };
@@ -37,8 +36,6 @@ class Sampler {
 
         return result;
     }
-
-    auto nextSample() -> vector_type { return next_sample(); }
 
   private:
     std::random_device random_device_{};
