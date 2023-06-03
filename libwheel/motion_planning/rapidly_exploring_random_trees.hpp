@@ -100,7 +100,7 @@ auto findPath(const GraphType &graph, const VertexType &source, const VertexType
 
 template <typename SamplerType>
 auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &source,
-                 const typename SamplerType::VectorType target)
+                 const typename SamplerType::VectorType target, std::size_t max_samples = 1000U)
     -> std::optional<typename SamplerType::SpaceType::PathType> {
 
     struct VertexProperties {
@@ -112,8 +112,10 @@ auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &s
     Graph graph;
     const auto source_vertex = boost::add_vertex(VertexProperties{source}, graph);
 
-    while (true) {
+    std::size_t num_samples{0U};
+    while (num_samples < max_samples) {
         detail::expandTree(graph, sampler, 100);
+        num_samples += 100U;
 
         if (detail::pathExists(graph, target)) {
             const auto nearest_vertex = detail::nearestElementTo(graph, target);
@@ -134,6 +136,8 @@ auto findRrtPath(SamplerType &sampler, const typename SamplerType::VectorType &s
             return std::nullopt;
         }
     }
+
+    return std::nullopt;
 }
 
 } // namespace wheel
