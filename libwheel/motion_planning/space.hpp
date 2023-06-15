@@ -17,6 +17,7 @@ template <typename VectorT>
 class Space {
   public:
     using VectorType = VectorT;
+    using vector_type = VectorType;
     using PathType = std::vector<VectorType>;
 
     static constexpr auto size{VectorType::size};
