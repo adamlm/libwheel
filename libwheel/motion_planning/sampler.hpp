@@ -16,7 +16,7 @@ class Sampler {
 
     explicit Sampler(SpaceType space) : generator_{random_device_()} {
         static constexpr auto make_distribution = [](const auto &bound_range) {
-            return DistributionType{bound_range.lower, bound_range.upper};
+            return DistributionType{bound_range.lower.get(), bound_range.upper.get()};
         };
 
         std::ranges::transform(std::as_const(space.get_bound_ranges()), std::back_inserter(distributions_),
