@@ -1,0 +1,34 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  Static-Analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release .
+
+      - name: Run clang-tidy
+        run: |
+          clang-tidy -p build/ test/*.cpp libwheel/metaprogramming/*.hpp
+
+  Unit-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release .
+
+      - name: Build and Test (Compile-Time Tests)
+        run: |
+          cmake --build build

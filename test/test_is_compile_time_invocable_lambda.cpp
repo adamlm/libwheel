@@ -14,7 +14,7 @@ auto runtime_lambda_static_test() -> void {
 // Compile-time tests
 static_assert(wheel::is_compile_time_invocable_lambda([] {}));
 
-static_assert(wheel::is_compile_time_invocable_lambda([] { std::size(std::array<float, 2>{}); }));
+static_assert(wheel::is_compile_time_invocable_lambda([] { static_cast<void>(std::size(std::array<float, 2>{})); }));
 static_assert(std::size(std::array<float, 2>{}) == 2);
 
-static_assert(!wheel::is_compile_time_invocable_lambda([] { std::size(std::list<int>{}); }));
+static_assert(!wheel::is_compile_time_invocable_lambda([] { static_cast<void>(std::size(std::list<int>{})); }));
