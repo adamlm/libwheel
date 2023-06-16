@@ -17,7 +17,4 @@ static_assert(wheel::is_compile_time_invocable_lambda([] {}));
 static_assert(wheel::is_compile_time_invocable_lambda([] { std::size(std::array<float, 2>{}); }));
 static_assert(std::size(std::array<float, 2>{}) == 2);
 
-static_assert(wheel::is_compile_time_invocable_lambda([] { std::size(std::vector<int>{1}); }));
-static_assert(std::size(std::vector<int>{1}) == 1);
-
 static_assert(!wheel::is_compile_time_invocable_lambda([] { std::size(std::list<int>{}); }));

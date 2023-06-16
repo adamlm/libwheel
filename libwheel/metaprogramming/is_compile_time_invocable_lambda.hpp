@@ -16,7 +16,7 @@ namespace wheel {
  */
 template <typename Lambda>
     requires std::default_initializable<Lambda> && std::invocable<Lambda>
-consteval auto is_compile_time_invocable_lambda(Lambda) -> std::enable_if_t<(Lambda{}(), true), bool> {
+consteval auto is_compile_time_invocable_lambda(Lambda /* lambda */) -> std::enable_if_t<(Lambda{}(), true), bool> {
     return true;
 }
 
@@ -28,7 +28,7 @@ consteval auto is_compile_time_invocable_lambda(Lambda) -> std::enable_if_t<(Lam
  * @param[in] 1 Lambda instance to be evaluated (not used)
  * @return false
  */
-consteval auto is_compile_time_invocable_lambda(auto) -> bool { return false; }
+consteval auto is_compile_time_invocable_lambda(auto /* lambda */) -> bool { return false; }
 
 } // namespace wheel
 
