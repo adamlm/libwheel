@@ -1,0 +1,18 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu-22.04",
+    "capAdd": [
+        "SYS_PTRACE"
+    ],
+    "securityOpt": [
+        "seccomp=unconfined"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    },
+    "remoteUser": "vscode"
+}
