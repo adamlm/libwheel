@@ -20,8 +20,6 @@ class Space {
     using vector_type = VectorType;
     using PathType = std::vector<VectorType>;
 
-    static constexpr auto size{VectorType::size};
-
     /**
      * @brief Construct a new Space object
      *
@@ -36,10 +34,11 @@ class Space {
      *
      * @return const std::array<wheel::BoundRange, kDimensions>& Immutable reference to the space's bound ranges
      */
-    auto getBoundRanges() const -> const std::array<wheel::BoundRange, size> & { return bound_ranges_; }
+    auto get_bound_ranges() const -> const std::vector<wheel::BoundRange> & { return bound_ranges_; }
+
 
   private:
-    std::array<BoundRange, size> bound_ranges_;
+    std::vector<BoundRange> bound_ranges_;
 };
 
 } // namespace wheel
