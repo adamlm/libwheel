@@ -38,7 +38,7 @@ class Space {
 
 
   private:
-    std::array<BoundRange, size> bound_ranges_;
+    std::vector<BoundRange> bound_ranges_;
 };
 
 } // namespace wheel
