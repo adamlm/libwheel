@@ -20,8 +20,6 @@ class Space {
     using vector_type = VectorType;
     using PathType = std::vector<VectorType>;
 
-    static constexpr auto size{VectorType::size};
-
     /**
      * @brief Construct a new Space object
      *
