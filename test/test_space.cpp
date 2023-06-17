@@ -19,7 +19,7 @@ TEST(SpaceTest, TestGetBoundRanges) {
 
     TestSpace space{x_bounds, y_bounds, z_bounds};
 
-    const auto bounds{space.getBoundRanges()};
+    const auto bounds{space.get_bound_ranges()};
 
     EXPECT_DOUBLE_EQ(bounds.at(0).lower.get(), x_bounds.lower.get());
     EXPECT_DOUBLE_EQ(bounds.at(1).lower.get(), y_bounds.lower.get());
