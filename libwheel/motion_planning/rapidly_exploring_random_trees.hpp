@@ -12,7 +12,7 @@ namespace wheel {
 namespace detail {
 
 template <typename GraphType, typename VectorType>
-auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typename GraphType::vertex_descriptor {
+auto nearest_vertex_to(const GraphType &graph, const VectorType &target) -> typename GraphType::vertex_descriptor {
     if (boost::num_vertices(graph) == 1) {
         return *boost::vertices(graph).first;
     }
@@ -32,18 +32,18 @@ auto nearestElementTo(const GraphType &graph, const VectorType &target) -> typen
     return nearest_vertex;
 }
 
-template <typename GraphType, typename SamplerType>
-auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples) -> void {
+template <typename TreeType, typename SamplerType>
+auto expand_tree(TreeType &tree, SamplerType &sampler, std::size_t num_samples) -> void {
     for (auto i{0U}; i < num_samples; ++i) {
         const auto sampled_config = sampler.next_sample();
 
-        auto nearest_vertex = nearestElementTo(graph, sampled_config);
+        auto nearest_vertex = nearest_vertex_to(tree, sampled_config);
         using namespace wheel;
-        const auto configs = interpolate(graph[nearest_vertex].config, sampled_config, 100);
+        const auto configs = interpolate(tree[nearest_vertex].config, sampled_config, 100);
 
         for (const auto &config : configs) {
-            const auto vertex = boost::add_vertex(typename boost::vertex_bundle_type<GraphType>::type{config}, graph);
-            boost::add_edge(nearest_vertex, vertex, graph);
+            const auto vertex = boost::add_vertex(typename boost::vertex_bundle_type<TreeType>::type{config}, tree);
+            boost::add_edge(nearest_vertex, vertex, tree);
 
             // The target vertex from the previous iteration becomes the source for the next one
             nearest_vertex = vertex;
@@ -52,7 +52,7 @@ auto expandTree(GraphType &graph, SamplerType &sampler, std::size_t num_samples)
 }
 
 template <typename GraphType, typename VectorType>
-auto pathExists(const GraphType &graph, const VectorType &target) -> bool {
+auto path_exists(const GraphType &graph, const VectorType &target) -> bool {
     double min_dist = std::numeric_limits<double>::max();
 
     for (auto [vertex, end] = boost::vertices(graph); vertex != end; ++vertex) {
@@ -67,10 +67,12 @@ auto pathExists(const GraphType &graph, const VectorType &target) -> bool {
     return false;
 }
 
-template <typename GraphType, typename VertexType>
-auto findPath(const GraphType &graph, const VertexType &source, const VertexType &target)
-    -> std::optional<std::vector<VertexType>> {
-    std::vector<VertexType> predecessors(boost::num_vertices(graph), std::numeric_limits<VertexType>::max());
+template <typename GraphType>
+auto find_path_in_graph(const GraphType &graph, const typename GraphType::vertex_descriptor &source,
+                        const typename GraphType::vertex_descriptor &target)
+    -> std::optional<std::vector<typename GraphType::vertex_descriptor>> {
+    std::vector<typename GraphType::vertex_descriptor> predecessors(
+        boost::num_vertices(graph), std::numeric_limits<typename GraphType::vertex_descriptor>::max());
     predecessors[source] = source;
 
     auto property_map =
@@ -80,10 +82,10 @@ auto findPath(const GraphType &graph, const VertexType &source, const VertexType
     boost::breadth_first_search(graph, boost::vertex(source, graph), boost::visitor(visitor));
 
     auto predecessor_index = target;
-    std::vector<VertexType> path{target};
+    std::vector<typename GraphType::vertex_descriptor> path{target};
 
     while (predecessors[predecessor_index] != predecessor_index) {
-        if (predecessor_index == std::numeric_limits<VertexType>::max()) {
+        if (predecessor_index == std::numeric_limits<typename GraphType::vertex_descriptor>::max()) {
             return std::nullopt;
         }
 
@@ -99,12 +101,12 @@ auto findPath(const GraphType &graph, const VertexType &source, const VertexType
 } // namespace detail
 
 template <typename SamplerType>
-auto findRrtPath(SamplerType &sampler, const typename SamplerType::vector_type &source,
-                 const typename SamplerType::vector_type target, std::size_t max_samples = 1000U)
+auto find_rrt_path(SamplerType &sampler, const typename SamplerType::sample_type &source,
+                   const typename SamplerType::sample_type target, std::size_t max_samples = 1000U)
     -> std::optional<typename SamplerType::space_type::PathType> {
 
     struct VertexProperties {
-        typename SamplerType::vector_type config;
+        typename SamplerType::sample_type config;
     };
 
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperties>;
@@ -114,16 +116,16 @@ auto findRrtPath(SamplerType &sampler, const typename SamplerType::vector_type &
 
     std::size_t num_samples{0U};
     while (num_samples < max_samples) {
-        detail::expandTree(graph, sampler, 100);
+        detail::expand_tree(graph, sampler, 100);
         num_samples += 100U;
 
-        if (detail::pathExists(graph, target)) {
-            const auto nearest_vertex = detail::nearestElementTo(graph, target);
+        if (detail::path_exists(graph, target)) {
+            const auto nearest_vertex = detail::nearest_vertex_to(graph, target);
             const auto target_vertex = boost::add_vertex(VertexProperties{target}, graph);
 
             boost::add_edge(target_vertex, nearest_vertex, graph);
 
-            const auto vertices = detail::findPath(graph, source_vertex, target_vertex);
+            const auto vertices = detail::find_path_in_graph(graph, source_vertex, target_vertex);
             if (vertices) {
                 typename SamplerType::space_type::PathType path;
                 path.reserve(std::size(vertices.value()));
