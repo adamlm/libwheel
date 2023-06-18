@@ -3,13 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <libwheel/motion_planning/space.hpp>
-#include <libwheel/motion_planning/vector.hpp>
 
-struct X {};
-struct Y {};
-struct Z {};
-
-using TestVector = wheel::Vector<wheel::IndexTypeList<X, Y, Z>, wheel::StorageTypeList<float, float, float>>;
+using TestVector = std::vector<float>;
 using TestSpace = wheel::Space<TestVector>;
 
 TEST(SpaceTest, TestGetBoundRanges) {
