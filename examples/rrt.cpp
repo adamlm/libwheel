@@ -4,11 +4,8 @@
 #include <Eigen/Dense>
 
 #include <libwheel/motion_planning/bound_range.hpp>
-// #include <libwheel/motion_planning/r2_space.hpp>
 #include <libwheel/motion_planning/rapidly_exploring_random_trees.hpp>
-#include <libwheel/motion_planning/sampler.hpp>
 #include <libwheel/motion_planning/space.hpp>
-#include <libwheel/motion_planning/utils.hpp>
 
 using R2Vector = Eigen::Vector2f;
 using R2Space = wheel::Space<R2Vector>;
@@ -46,22 +43,22 @@ struct wheel::Interpolator<Eigen::Vector2f> {
     }
 };
 
+auto print_path(const std::vector<R2Vector> &path, std::ostream &stream = std::cout) -> void {
+    for (const auto &point : path) {
+        stream << point.transpose().eval() << '\n';
+    }
+}
+
 auto main() -> int {
     const R2Space space{wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound(5.0)},
                         wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound(5.0)}};
 
-    wheel::UniformSampler sampler{space};
-
     const auto path = find_path_rrt(space, R2Vector{2, 3}, R2Vector{1, 1});
-    (void)path;
 
     if (path.has_value()) {
         std::cout << "Path found!\n";
         std::ofstream filename{"path.txt"};
-
-        // std::cout << path.value() << '\n';
-
-        // wheel::printPathNodes(path.value(), filename);
+        print_path(path.value(), filename);
     }
 
     return 0;
