@@ -6,6 +6,10 @@
 #include <array>
 #include <random>
 
+#include "libwheel/motion_planning/buffer_type_dispatcher.hpp"
+#include "libwheel/motion_planning/copy_buffer_data_strategy.hpp"
+#include "libwheel/motion_planning/resize_strategy.hpp"
+
 namespace wheel {
 
 template <typename SpaceType, typename DistributionType = std::uniform_real_distribution<>>
