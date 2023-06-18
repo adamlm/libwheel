@@ -1,6 +1,11 @@
 #ifndef LIBWHEEL_MOTION_PLANNING_DEFAULT_BUFFER_TYPE_HPP
 #define LIBWHEEL_MOTION_PLANNING_DEFAULT_BUFFER_TYPE_HPP
 
+#include <array>
+#include <vector>
+
+#include <libwheel/metaprogramming/is_compile_time_invocable_lambda.hpp>
+
 namespace wheel {
 
 template <typename T>
