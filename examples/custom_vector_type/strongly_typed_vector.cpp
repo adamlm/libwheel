@@ -1,5 +1,4 @@
 #include <iostream>
-#include <span>
 
 #include <libwheel/motion_planning/bound_range.hpp>
 #include <libwheel/motion_planning/buffer_type_dispatcher.hpp>
