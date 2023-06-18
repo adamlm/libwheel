@@ -26,25 +26,25 @@ struct wheel::ResizeStrategy<Eigen::Vector2f> {
     static auto resize(Eigen::Vector2f & /* sample */, std::size_t /* new_size */) {}
 };
 
-namespace wheel {
 template <>
-auto euclidean_distance(const Eigen::Vector2f &a, const Eigen::Vector2f &b) -> double {
-    return (a - b).norm();
-}
+struct wheel::EuclideanDistance<Eigen::Vector2f> {
+    static auto distance(const Eigen::Vector2f &a, const Eigen::Vector2f &b) -> double { return (a - b).norm(); }
+};
 
 template <>
-auto interpolate(const Eigen::Vector2f &start, const Eigen::Vector2f &stop, std::size_t num_samples)
-    -> std::vector<Eigen::Vector2f> {
-    std::vector<Eigen::Vector2f> samples;
+struct wheel::Interpolator<Eigen::Vector2f> {
+    static auto interpolate(const Eigen::Vector2f &start, const Eigen::Vector2f &stop, std::size_t num_samples)
+        -> std::vector<Eigen::Vector2f> {
+        std::vector<Eigen::Vector2f> samples;
 
-    const auto step_size = (start - stop) / (num_samples - 1U);
-    for (auto i{0U}; i < num_samples; ++i) {
-        samples.emplace_back(start + i * step_size);
+        const auto step_size = (start - stop) / (num_samples - 1U);
+        for (auto i{0U}; i < num_samples; ++i) {
+            samples.emplace_back(start + i * step_size);
+        }
+
+        return samples;
     }
-
-    return samples;
-}
-} // namespace wheel
+};
 
 auto main() -> int {
     const R2Space space{wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound(5.0)},

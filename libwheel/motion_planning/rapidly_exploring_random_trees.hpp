@@ -12,10 +12,15 @@
 namespace wheel {
 
 template <typename VectorType>
-auto euclidean_distance(const VectorType &, const VectorType &) -> double;
+struct EuclideanDistance {
+    static auto distance(const VectorType & /* a */, const VectorType & /* b */) -> double;
+};
 
 template <typename VectorType>
-auto interpolate(const VectorType &, const VectorType &, std::size_t) -> std::vector<VectorType>;
+struct Interpolator {
+    static auto interpolate(const VectorType & /* start */, const VectorType & /* stop */, std::size_t /* count */)
+        -> std::vector<VectorType>;
+};
 
 namespace detail {
 
@@ -30,7 +35,7 @@ auto nearest_vertex_to(const GraphType &graph, const VectorType &target) -> type
 
     for (auto [it, end] = boost::vertices(graph); it < end - 1; ++it) {
         // using wheel::euclidean_distance;
-        const auto distance{euclidean_distance(graph[*it].config, target)};
+        const auto distance{EuclideanDistance<VectorType>::distance(graph[*it].config, target)};
         if (distance < nearest_distance) {
             nearest_vertex = *it;
             nearest_distance = distance;
@@ -47,7 +52,8 @@ auto expand_tree(TreeType &tree, SamplerType &sampler, std::size_t num_samples) 
 
         auto nearest_vertex = nearest_vertex_to(tree, sampled_config);
         // using wheel::interpolate;
-        const auto configs = interpolate(tree[nearest_vertex].config, sampled_config, 100);
+        const auto configs = Interpolator<typename SamplerType::sample_type>::interpolate(tree[nearest_vertex].config,
+                                                                                          sampled_config, 100);
 
         for (const auto &config : configs) {
             const auto vertex = boost::add_vertex(typename boost::vertex_bundle_type<TreeType>::type{config}, tree);
@@ -65,7 +71,7 @@ auto path_exists(const GraphType &graph, const VectorType &target) -> bool {
 
     for (auto [vertex, end] = boost::vertices(graph); vertex != end; ++vertex) {
         using namespace wheel;
-        if (const auto dist = euclidean_distance(graph[*vertex].config, target); dist < 1.0) {
+        if (const auto dist = EuclideanDistance<VectorType>::distance(graph[*vertex].config, target); dist < 1.0) {
             return true;
         } else {
             min_dist = std::min(min_dist, dist);
