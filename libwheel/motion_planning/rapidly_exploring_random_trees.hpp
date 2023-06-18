@@ -7,7 +7,15 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 
+#include "libwheel/motion_planning/sampler.hpp"
+
 namespace wheel {
+
+template <typename VectorType>
+auto euclidean_distance(const VectorType &, const VectorType &) -> double;
+
+template <typename VectorType>
+auto interpolate(const VectorType &, const VectorType &, std::size_t) -> std::vector<VectorType>;
 
 namespace detail {
 
@@ -21,7 +29,7 @@ auto nearest_vertex_to(const GraphType &graph, const VectorType &target) -> type
     auto nearest_distance{std::numeric_limits<double>::max()};
 
     for (auto [it, end] = boost::vertices(graph); it < end - 1; ++it) {
-        using namespace wheel;
+        // using wheel::euclidean_distance;
         const auto distance{euclidean_distance(graph[*it].config, target)};
         if (distance < nearest_distance) {
             nearest_vertex = *it;
@@ -38,7 +46,7 @@ auto expand_tree(TreeType &tree, SamplerType &sampler, std::size_t num_samples) 
         const auto sampled_config = sampler.next_sample();
 
         auto nearest_vertex = nearest_vertex_to(tree, sampled_config);
-        using namespace wheel;
+        // using wheel::interpolate;
         const auto configs = interpolate(tree[nearest_vertex].config, sampled_config, 100);
 
         for (const auto &config : configs) {
@@ -137,6 +145,44 @@ auto find_rrt_path(SamplerType &sampler, const typename SamplerType::sample_type
 
             return std::nullopt;
         }
+    }
+
+    return std::nullopt;
+}
+
+template <typename SpaceType>
+auto find_path_rrt(const SpaceType &space, const typename SpaceType::vector_type &source,
+                   const typename SpaceType::vector_type &target, std::size_t max_samples = 1000U)
+    -> std::optional<std::vector<typename SpaceType::vector_type>> {
+
+    struct VertexProperties {
+        typename SpaceType::vector_type config;
+    };
+
+    using Tree = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperties>;
+
+    Tree tree;
+    const auto source_vertex = boost::add_vertex(VertexProperties{source}, tree);
+
+    UniformSampler sampler{space};
+    for (auto sample_count{0U}; sample_count < max_samples; sample_count += 100U) {
+        detail::expand_tree(tree, sampler, 100U);
+
+        const auto nearest_vertex = detail::nearest_vertex_to(tree, target);
+        const auto target_vertex = boost::add_vertex(VertexProperties{target}, tree);
+
+        boost::add_edge(target_vertex, nearest_vertex, tree);
+        const auto vertex_path = detail::find_path_in_graph(tree, source_vertex, target_vertex);
+
+        if (vertex_path.has_value()) {
+            std::vector<typename SpaceType::vector_type> path;
+            std::ranges::transform(vertex_path.value(), std::back_inserter(path),
+                                   [&tree](const auto &vertex) { return tree[vertex].config; });
+
+            return path;
+        }
+
+        boost::remove_vertex(target_vertex, tree);
     }
 
     return std::nullopt;
