@@ -114,48 +114,6 @@ auto find_path_in_graph(const GraphType &graph, const typename GraphType::vertex
 
 } // namespace detail
 
-template <typename SamplerType>
-auto find_rrt_path(SamplerType &sampler, const typename SamplerType::sample_type &source,
-                   const typename SamplerType::sample_type target, std::size_t max_samples = 1000U)
-    -> std::optional<typename SamplerType::space_type::PathType> {
-
-    struct VertexProperties {
-        typename SamplerType::sample_type config;
-    };
-
-    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperties>;
-
-    Graph graph;
-    const auto source_vertex = boost::add_vertex(VertexProperties{source}, graph);
-
-    std::size_t num_samples{0U};
-    while (num_samples < max_samples) {
-        detail::expand_tree(graph, sampler, 100);
-        num_samples += 100U;
-
-        if (detail::path_exists(graph, target)) {
-            const auto nearest_vertex = detail::nearest_vertex_to(graph, target);
-            const auto target_vertex = boost::add_vertex(VertexProperties{target}, graph);
-
-            boost::add_edge(target_vertex, nearest_vertex, graph);
-
-            const auto vertices = detail::find_path_in_graph(graph, source_vertex, target_vertex);
-            if (vertices) {
-                typename SamplerType::space_type::PathType path;
-                path.reserve(std::size(vertices.value()));
-                std::ranges::transform(vertices.value(), std::back_inserter(path),
-                                       [&graph](const auto &vertex) { return graph[vertex].config; });
-
-                return path;
-            }
-
-            return std::nullopt;
-        }
-    }
-
-    return std::nullopt;
-}
-
 template <typename SpaceType>
 auto find_path_rrt(const SpaceType &space, const typename SpaceType::vector_type &source,
                    const typename SpaceType::vector_type &target, std::size_t max_samples = 1000U)
