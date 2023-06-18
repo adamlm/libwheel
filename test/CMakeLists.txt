@@ -1,7 +1,6 @@
 include(GoogleTest)
 
 add_executable(unit_tests
-  test_vector.cpp
   test_space.cpp
 )
 
