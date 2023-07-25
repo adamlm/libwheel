@@ -1,0 +1,10 @@
+#ifndef LIBWHEEL_STRONGLY_TYPED_MATRIX_INDEX_TYPES_HPP
+#define LIBWHEEL_STRONGLY_TYPED_MATRIX_INDEX_TYPES_HPP
+
+namespace wheel {
+
+struct NoIdxType {};
+
+} // namespace wheel
+
+#endif // LIBWHEEL_STRONGLY_TYPED_MATRIX_INDEX_TYPES_HPP
