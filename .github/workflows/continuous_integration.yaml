@@ -1,6 +1,10 @@
 name: Continuous Integration
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   Static-Analysis:
@@ -23,7 +27,7 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          clang-tidy -p build/ test/*.cpp libwheel/angle/*.hpp
+          clang-tidy -p build/ test/*.cpp libwheel/angle/*.hpp libwheel/metaprogramming/*.hpp
 
   Unit-Tests:
     runs-on: ubuntu-latest
