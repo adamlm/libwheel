@@ -5,7 +5,7 @@ add_library(libwheel::motion_planning ALIAS wheel_motion_planningLibrary)
 
 target_include_directories(wheel_motion_planningLibrary
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/motion_planning>
 )
 
 target_link_libraries(wheel_motion_planningLibrary

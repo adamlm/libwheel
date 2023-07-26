@@ -3,7 +3,7 @@ add_library(libwheel::strongly_typed_matrix ALIAS wheel_strongly_typed_matrixLib
 
 target_include_directories(wheel_strongly_typed_matrixLibrary
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/strongly_typed_matrix>
 )
 
 target_link_libraries(wheel_strongly_typed_matrixLibrary

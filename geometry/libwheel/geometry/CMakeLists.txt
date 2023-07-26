@@ -5,7 +5,7 @@ add_library(libwheel::geometry ALIAS wheel_geometryLibrary)
 
 target_include_directories(wheel_geometryLibrary
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/geometry>
 )
 
 target_link_libraries(wheel_geometryLibrary
