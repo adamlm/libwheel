@@ -1,0 +1,65 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  CTest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          # - macos-latest
+          # - windows-latest
+        compiler:
+          - llvm-14
+          # - gcc
+        build_type:
+          # - Release
+          - Debug
+        # include:
+        #   - os: windows-latest
+        #     compiler: msvc
+        # exclude:
+        #   - os: windows-latest
+        #     compiler: gcc
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Setup C++
+      #   uses: aminya/setup-cpp@v0.26.2
+      #   with:
+      #     compiler: ${{ matrix.compiler }}
+      #     cmake: true
+      #     ninja: true
+      #     make: true
+      #     conan: true
+
+      # - name: Setup Conan
+      #   run: |
+      #     conan install . --output-folder=build --build=missing
+
+      # - name: Build and Test
+      #   run: |
+      #     cmake -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+      #     cmake --build build
+      #     cd build
+      #     ctest
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libboost-graph1.74-dev libgtest-dev
+
+      - name: Build and Test
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+          cmake --build build
+          cd build
+          ctest
