@@ -3,7 +3,7 @@ add_library(libwheel::angle ALIAS wheel_angleLibrary)
 
 target_include_directories(wheel_angleLibrary
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/angle>
 )
 
 target_compile_features(wheel_angleLibrary

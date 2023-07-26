@@ -5,7 +5,7 @@ add_library(libwheel::metaprogramming ALIAS wheel_metaprogrammingLibrary)
 
 target_include_directories(wheel_metaprogrammingLibrary
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/metaprogramming>
 )
 
 target_compile_features(wheel_metaprogrammingLibrary

@@ -2,20 +2,38 @@
 # property---added in CMake 3.25---set to TRUE. Otherwise, the compiler warnings
 # will complain about issues in third-party libraries.
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
-project(wheel)
+project(libwheel)
 enable_testing()
 
-option(wheel_ENABLE_TESTING "Enable unit tests" ${PROJECT_IS_TOP_LEVEL})
-option(wheel_BUILD_EXAMPES "Build examples" ${PROJECT_IS_TOP_LEVEL})
-option(wheel_EXPORT_COMPILE_COMMANDS "Export compile commands" TRUE)
+option(libwheel_EXPORT_COMPILE_COMMANDS "Export compile commands" ${PROJECT_IS_TOP_LEVEL})
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ${wheel_EXPORT_COMPILE_COMMANDS})
+option(libwheel_BUILD_ANGLE "Build the Wheel Angle library" ON)
+option(libwheel_BUILD_GEOMETRY "Build the Wheel Geometry library" ON)
+option(libwheel_BUILD_METAPROGRAMMING "Build the Wheel Metaprogramming library" ON)
+option(libwheel_BUILD_MOTION_PLANNING "Build the Wheel Motion Planning library" ON)
+option(libwheel_BUILD_STRONGLY_TYPED_MATRIX "Build the Wheel Strongly-Typed Matrix library" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(dependencies.cmake)
 
-add_subdirectory(libwheel/geometry)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ${libwheel_EXPORT_COMPILE_COMMANDS})
 
-if(wheel_ENABLE_TESTING OR PROJECT_IS_TOP_LEVEL)
-  add_subdirectory(test/geometry)
+if(libwheel_BUILD_ANGLE)
+  add_subdirectory(angle)
+endif()
+
+if(libwheel_BUILD_GEOMETRY)
+  add_subdirectory(geometry)
+endif()
+
+if(libwheel_BUILD_METAPROGRAMMING)
+  add_subdirectory(metaprogramming)
+endif()
+
+if(libwheel_BUILD_MOTION_PLANNING)
+  # add_subdirectory(motion_planning)
+endif()
+
+if(libwheel_BUILD_STRONGLY_TYPED_MATRIX)
+  add_subdirectory(strongly_typed_matrix)
 endif()

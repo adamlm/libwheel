@@ -6,8 +6,8 @@ add_executable(strongly_typed_matrix_tests
 target_link_libraries(strongly_typed_matrix_tests
   PRIVATE
     libwheel::strongly_typed_matrix
-    GTest::GTest
-    GTest::Main
+    GTest::gtest
+    GTest::gtest_main
 )
 
 target_compile_options(strongly_typed_matrix_tests
