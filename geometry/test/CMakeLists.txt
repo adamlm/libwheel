@@ -1,9 +1,12 @@
 include(wheel_compiler_warnings)
 
 add_executable(libwheel_geometry_unit_tests
+  test_half_plane.cpp
   test_line.cpp
   test_linear_equation.cpp
+  test_polygon.cpp
 )
+
 target_link_libraries(libwheel_geometry_unit_tests
   PRIVATE
     libwheel::geometry
