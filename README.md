@@ -19,11 +19,8 @@ Wheel Library offers the following collections (See each collection's `README.md
 
 ## Building and installing
 
-This library is header only, so you can embed it directly into your project. You can also build it using CMake and
-import it using CMake's `find_package(...)` functionality.
-
 The Wheel Library is header only and uses CMake as its build system. It's designed to be integrated into other CMake
-projects, so you can use `FetchContent` or another mechanism to bring `libwheel` into your project. If you want to
+projects, so you can use `FetchContent` or another mechanism to embed `libwheel` into your project. If you want to
 build and install `libwheel` by itself, there are several CMake customization options. For building the library with
 the default options, follow these steps:
 
