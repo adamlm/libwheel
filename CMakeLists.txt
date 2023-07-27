@@ -7,11 +7,11 @@ enable_testing()
 
 option(libwheel_EXPORT_COMPILE_COMMANDS "Export compile commands" ${PROJECT_IS_TOP_LEVEL})
 
-option(libwheel_BUILD_ANGLE "Build the Wheel Angle library" ON)
-option(libwheel_BUILD_GEOMETRY "Build the Wheel Geometry library" ON)
-option(libwheel_BUILD_METAPROGRAMMING "Build the Wheel Metaprogramming library" ON)
-option(libwheel_BUILD_MOTION_PLANNING "Build the Wheel Motion Planning library" ON)
-option(libwheel_BUILD_STRONGLY_TYPED_MATRIX "Build the Wheel Strongly-Typed Matrix library" ON)
+option(libwheel_BUILD_ANGLE "Build the Wheel Angle library" TRUE)
+option(libwheel_BUILD_GEOMETRY "Build the Wheel Geometry library" TRUE)
+option(libwheel_BUILD_METAPROGRAMMING "Build the Wheel Metaprogramming library" TRUE)
+option(libwheel_BUILD_MOTION_PLANNING "Build the Wheel Motion Planning library" TRUE)
+option(libwheel_BUILD_STRONGLY_TYPED_MATRIX "Build the Wheel Strongly-Typed Matrix library" TRUE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(dependencies.cmake)

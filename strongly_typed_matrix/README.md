@@ -1,10 +1,10 @@
-# Introduction
+# The Wheel Strongly-Typed Matrix Library
 
 The Wheel Strongly-Typed Matrix library creates a type-safe wraps around a linear algebra matrix type (for now,
 `Eigen::Matrix`). This library leverages C++'s strong type system to provide compile-time guarantees that the
 operations you perform (or attempt to perform) are mathematically and semantically valid.
 
-# Motivation
+## Motivation
 
 Daniel Withopf's presentations on type-safe matrix operations inspired this work. In his lectures, Daniel introduced
 dimensioned linear algebra and described how the theory translates to software. He developed a library during his time
@@ -23,3 +23,20 @@ at Bosch, but the source code is unavailable. Fortunately, he overviews enough o
 
 - _Physical Units for Matrices: How Hard Can It Be?_ - Presented at MUC++ 2021
   ([video](https://www.youtube.com/watch?v=J6H9CwzynoQ))
+
+## Using in your project
+
+1. Add Wheel Strongly-Typed Matrix as a dependency in your project
+
+   ```cmake
+   find_package(libwheel_strongly_typed_matrix REQUIRED)
+   ```
+
+2. Link against it in your project
+
+   ```cmake
+   target_link_libraries(your_project
+     PRIVATE
+       libwheel::strongly_typed_matrix
+   )
+   ```
