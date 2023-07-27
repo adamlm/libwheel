@@ -11,6 +11,7 @@ target_include_directories(wheel_geometryLibrary
 target_link_libraries(wheel_geometryLibrary
   INTERFACE
     Eigen3::Eigen
+    range-v3::range-v3
 )
 
 target_compile_features(wheel_geometryLibrary
