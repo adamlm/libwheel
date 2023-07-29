@@ -128,7 +128,7 @@ auto find_path_rrt(const SpaceType &space, const typename SpaceType::vector_type
     Tree tree;
     const auto source_vertex = boost::add_vertex(VertexProperties{source}, tree);
 
-    UniformSampler sampler{space};
+    UniformSampler<SpaceType> sampler{space};
     for (auto sample_count{0U}; sample_count < max_samples; sample_count += 100U) {
         detail::expand_tree(tree, sampler, 100U);
 

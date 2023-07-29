@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 
 using CustomVector = Eigen::Vector3f;
+using CustomSpace = wheel::Space<CustomVector>;
 
 template <typename Derived>
     requires std::is_base_of_v<Eigen::MatrixBase<Derived>, Derived>
@@ -33,11 +34,11 @@ struct wheel::CopyBufferDataStrategy<CustomVector, std::array<float, 3>> {
 };
 
 int main() {
-    const wheel::Space<CustomVector> space{wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
-                                           wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}},
-                                           wheel::BoundRange{wheel::LowerBound{20.0}, wheel::UpperBound{30.0}}};
+    const CustomSpace space{wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
+                            wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}},
+                            wheel::BoundRange{wheel::LowerBound{20.0}, wheel::UpperBound{30.0}}};
 
-    wheel::UniformSampler sampler{space};
+    wheel::UniformSampler<CustomSpace> sampler{space};
 
     for (auto i{0}; i < 20; ++i) {
         const auto sample{sampler.next_sample()};

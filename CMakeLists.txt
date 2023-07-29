@@ -31,7 +31,7 @@ if(libwheel_BUILD_METAPROGRAMMING)
 endif()
 
 if(libwheel_BUILD_MOTION_PLANNING)
-  # add_subdirectory(motion_planning)
+  add_subdirectory(motion_planning)
 endif()
 
 if(libwheel_BUILD_STRONGLY_TYPED_MATRIX)

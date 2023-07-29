@@ -1,6 +1,7 @@
 # Install CMake dependency management script
 # The get_cpm.cmake script must be included before CPMAddPackage(...) calls
 set(CPM_DOWNLOAD_VERSION 0.38.2)
+set(CPM_USE_LOCAL_PACKAGES TRUE)
 include(cmake/get_cpm.cmake)
 
 # Packages installed through CPM do not need a find_package(...) call
@@ -27,3 +28,14 @@ CPMAddPackage(NAME range-v3
   OPTIONS
     "RANGES_CXX_STD 20"
 )
+
+CPMAddPackage(NAME Boost
+  GITHUB_REPOSITORY "boostorg/boost"
+  GIT_TAG boost-1.82.0
+  SYSTEM TRUE
+  EXCLUDE_FROM_ALL TRUE
+  OPTIONS
+    "BOOST_INCLUDE_LIBRARIES graph"
+)
+
+find_package(Boost REQUIRED COMPONENTS Graph)
