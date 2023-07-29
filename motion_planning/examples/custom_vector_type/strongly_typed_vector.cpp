@@ -14,6 +14,7 @@ struct IdxY {};
 
 using RowIdxList = wheel::TypeList<IdxX, IdxY>;
 using CustomVector = wheel::StronglyTypedVector<double, RowIdxList, struct Tag>;
+using CustomSpace = wheel::Space<CustomVector>;
 
 template <>
 struct wheel::buffer_type_dispatcher<CustomVector> : std::type_identity<std::array<double, 2>> {};
@@ -27,10 +28,10 @@ struct wheel::CopyBufferDataStrategy<CustomVector, std::array<double, 2>> {
 };
 
 auto main() -> int {
-    const wheel::Space<CustomVector> space{wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
-                                           wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}}};
+    const CustomSpace space{wheel::BoundRange{wheel::LowerBound{-5.0}, wheel::UpperBound{5.0}},
+                            wheel::BoundRange{wheel::LowerBound{0.0}, wheel::UpperBound{1.0}}};
 
-    wheel::UniformSampler sampler{space};
+    wheel::UniformSampler<CustomSpace> sampler{space};
 
     for (auto i{0}; i < 20; ++i) {
         const auto sample{sampler.next_sample()};

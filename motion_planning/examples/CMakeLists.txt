@@ -1,5 +1,3 @@
-include(${PROJECT_SOURCE_DIR}/cmake/compiler_warnings.cmake)
-
 add_subdirectory(custom_vector_type)
 
 add_executable(rrt rrt.cpp)

@@ -25,7 +25,9 @@ struct wheel::ResizeStrategy<Eigen::Vector2f> {
 
 template <>
 struct wheel::EuclideanDistance<Eigen::Vector2f> {
-    static auto distance(const Eigen::Vector2f &a, const Eigen::Vector2f &b) -> double { return (a - b).norm(); }
+    static auto distance(const Eigen::Vector2f &a, const Eigen::Vector2f &b) -> double {
+        return static_cast<double>((a - b).norm());
+    }
 };
 
 template <>
