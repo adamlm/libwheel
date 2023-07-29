@@ -21,8 +21,19 @@ Wheel Library offers the following collections (See each collection's `README.md
 
 The Wheel Library is header only and uses CMake as its build system. It's designed to be integrated into other CMake
 projects, so you can use `FetchContent` or another mechanism to embed `libwheel` into your project. If you want to
-build and install `libwheel` by itself, there are several CMake customization options. For building the library with
-the default options, follow these steps:
+build and install `libwheel` by itself, there are several CMake customization options.
+
+**Note:** The Wheel Library requires C++20 or newer.
+
+### Required tools
+
+- **CMake:** 3.25 or newer
+- **If compiling with Clang:** 16.0.0 or newer
+- **If compiling with GCC:** 11.3.0 or newer
+
+### Build steps
+
+For building the library with the default options, follow these steps:
 
 1. Configure the CMake project
 
