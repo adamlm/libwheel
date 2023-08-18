@@ -3,17 +3,22 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
         "ms-vscode.cmake-tools",
-        "streetsidesoftware.code-spell-checker"
+        "streetsidesoftware.code-spell-checker",
+        "esbenp.prettier-vscode"
       ]
     }
   },
-  "capAdd": ["SYS_PTRACE"],
+  "capAdd": [
+    "SYS_PTRACE" // Allows debugging inside container
+  ],
   "securityOpt": ["seccomp=unconfined"],
-  "containerUser": "vscode",
-  "remoteUser": "vscode",
   "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace,Z",
   "workspaceFolder": "/workspace",
-  "runArgs": ["--userns=keep-id"]
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--userns=keep-id" // Allows mapping to non-root user in rootless container (podman only)
+  ]
 }
