@@ -29,13 +29,13 @@ CPMAddPackage(NAME range-v3
     "RANGES_CXX_STD 20"
 )
 
-CPMAddPackage(NAME Boost
-  GITHUB_REPOSITORY "boostorg/boost"
-  GIT_TAG boost-1.82.0
-  SYSTEM TRUE
-  EXCLUDE_FROM_ALL TRUE
-  OPTIONS
-    "BOOST_INCLUDE_LIBRARIES graph"
-)
+#CPMAddPackage(NAME Boost
+#  GITHUB_REPOSITORY "boostorg/boost"
+#  GIT_TAG boost-1.82.0
+#  SYSTEM TRUE
+#  EXCLUDE_FROM_ALL TRUE
+#  OPTIONS
+#    "BOOST_INCLUDE_LIBRARIES graph"
+#)
 
 find_package(Boost REQUIRED COMPONENTS Graph)

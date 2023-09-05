@@ -5,35 +5,15 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 project(libwheel)
 enable_testing()
 
-option(libwheel_EXPORT_COMPILE_COMMANDS "Export compile commands" ${PROJECT_IS_TOP_LEVEL})
-
-option(libwheel_BUILD_ANGLE "Build the Wheel Angle library" TRUE)
-option(libwheel_BUILD_GEOMETRY "Build the Wheel Geometry library" TRUE)
-option(libwheel_BUILD_METAPROGRAMMING "Build the Wheel Metaprogramming library" TRUE)
-option(libwheel_BUILD_MOTION_PLANNING "Build the Wheel Motion Planning library" TRUE)
-option(libwheel_BUILD_STRONGLY_TYPED_MATRIX "Build the Wheel Strongly-Typed Matrix library" TRUE)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(options.cmake)
 include(dependencies.cmake)
+
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ${libwheel_EXPORT_COMPILE_COMMANDS})
 
-if(libwheel_BUILD_ANGLE)
-  add_subdirectory(angle)
-endif()
-
-if(libwheel_BUILD_GEOMETRY)
-  add_subdirectory(geometry)
-endif()
-
-if(libwheel_BUILD_METAPROGRAMMING)
-  add_subdirectory(metaprogramming)
-endif()
-
-if(libwheel_BUILD_MOTION_PLANNING)
-  add_subdirectory(motion_planning)
-endif()
-
-if(libwheel_BUILD_STRONGLY_TYPED_MATRIX)
-  add_subdirectory(strongly_typed_matrix)
-endif()
+add_subdirectory(angle)
+add_subdirectory(geometry)
+add_subdirectory(metaprogramming)
+add_subdirectory(motion_planning)
+add_subdirectory(strongly_typed_matrix)
