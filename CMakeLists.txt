@@ -12,15 +12,9 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ${libwheel_EXPORT_COMPILE_COMMANDS})
 
-if(libwheel_BUILD_ANGLE)
-  add_subdirectory(angle)
-endif()
-
+add_subdirectory(angle)
 add_subdirectory(geometry)
-
-if(libwheel_BUILD_METAPROGRAMMING)
-  add_subdirectory(metaprogramming)
-endif()
+add_subdirectory(metaprogramming)
 
 if(libwheel_BUILD_MOTION_PLANNING)
   add_subdirectory(motion_planning)
