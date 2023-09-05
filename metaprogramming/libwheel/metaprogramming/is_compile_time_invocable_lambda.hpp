@@ -28,7 +28,12 @@ consteval auto is_compile_time_invocable_lambda(Lambda /* lambda */) -> std::ena
  * @param[in] 1 Lambda instance to be evaluated (not used)
  * @return false
  */
-consteval auto is_compile_time_invocable_lambda(auto /* lambda */) -> bool { return false; }
+consteval auto is_compile_time_invocable_lambda(...) -> bool { // NOLINT(cert-dcl50-cpp)
+    // Linting note: C-style variadic function argument is lowest in overload resolution priority, so this will match
+    // only if the argument cannot be converted to some type of functor. Therefore, we can ignore the linting warning.
+
+    return false;
+}
 
 } // namespace wheel
 
