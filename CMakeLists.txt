@@ -17,7 +17,3 @@ add_subdirectory(geometry)
 add_subdirectory(metaprogramming)
 add_subdirectory(motion_planning)
 add_subdirectory(strongly_typed_matrix)
-
-if(libwheel_bounded_value_BUILD_LIB)
-  add_subdirectory(bounded_value)
-endif()
