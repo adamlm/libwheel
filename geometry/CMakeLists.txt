@@ -11,8 +11,5 @@ if(libwheel_geometry_BUILD_TESTS)
 endif()
 
 if(libwheel_geometry_BUILD_EXAMPLES)
-
   add_subdirectory(examples)
-else()
-  message(FATAL_ERROR "YES")
 endif()

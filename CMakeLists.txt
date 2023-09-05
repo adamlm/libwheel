@@ -15,14 +15,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ${libwheel_EXPORT_COMPILE_COMMANDS})
 add_subdirectory(angle)
 add_subdirectory(geometry)
 add_subdirectory(metaprogramming)
-
-if(libwheel_BUILD_MOTION_PLANNING)
-  add_subdirectory(motion_planning)
-endif()
-
-if(libwheel_BUILD_STRONGLY_TYPED_MATRIX)
-  add_subdirectory(strongly_typed_matrix)
-endif()
+add_subdirectory(motion_planning)
+add_subdirectory(strongly_typed_matrix)
 
 if(libwheel_bounded_value_BUILD_LIB)
   add_subdirectory(bounded_value)
