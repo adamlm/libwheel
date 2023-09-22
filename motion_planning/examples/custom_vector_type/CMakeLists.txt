@@ -10,7 +10,10 @@ target_link_libraries(struct_vector
     libwheel::motion_planning
 )
 
-wheel_cmake_target_compiler_warnings(struct_vector)
+libwheel_target_set_compiler_warnings(struct_vector
+  PRIVATE
+  WARNINGS_AS_ERRORS
+)
 
 
 add_executable(strongly_typed_vector strongly_typed_vector.cpp)
@@ -21,7 +24,10 @@ target_link_libraries(strongly_typed_vector
     libwheel::strongly_typed_matrix
 )
 
-wheel_cmake_target_compiler_warnings(strongly_typed_vector)
+libwheel_target_set_compiler_warnings(strongly_typed_vector
+  PRIVATE
+  WARNINGS_AS_ERRORS
+)
 
 
 add_executable(eigen_vector eigen_vector.cpp)
@@ -37,4 +43,7 @@ target_link_libraries(eigen_vector
     Eigen3::Eigen
 )
 
-wheel_cmake_target_compiler_warnings(eigen_vector)
+libwheel_target_set_compiler_warnings(eigen_vector
+  PRIVATE
+  WARNINGS_AS_ERRORS
+)

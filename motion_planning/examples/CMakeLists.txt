@@ -13,4 +13,7 @@ target_link_libraries(rrt
     Eigen3::Eigen
 )
 
-wheel_cmake_target_compiler_warnings(rrt)
+libwheel_target_set_compiler_warnings(rrt
+  PRIVATE
+  WARNINGS_AS_ERRORS
+)
