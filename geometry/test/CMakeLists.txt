@@ -14,7 +14,10 @@ target_link_libraries(libwheel_geometry_unit_tests
     GTest::gtest_main
 )
 
-wheel_cmake_target_compiler_warnings(libwheel_geometry_unit_tests)
+libwheel_target_set_compiler_warnings(libwheel_geometry_unit_tests
+  PRIVATE
+  WARNINGS_AS_ERRORS
+)
 
 include(GoogleTest)
 gtest_discover_tests(libwheel_geometry_unit_tests)
