@@ -3,8 +3,10 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.python",
         "ms-vscode.cpptools-extension-pack",
-        "ms-vscode.cmake-tools",
         "streetsidesoftware.code-spell-checker",
         "esbenp.prettier-vscode"
       ]
@@ -14,11 +16,12 @@
     "SYS_PTRACE" // Allows debugging inside container
   ],
   "securityOpt": ["seccomp=unconfined"],
-  "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace,Z",
+  "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace", // Hosts without SELinux
+  // "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace,Z", // Hosts with SELinux
   "workspaceFolder": "/workspace",
-  "containerUser": "vscode",
-  "remoteUser": "vscode",
+  "containerUser": "vscode", // Rootful Docker or rootless Podman with `--userns=keep-id` run argument
+  "remoteUser": "vscode", // Rootful Docker or rootless Podman with `--userns=keep-id` run argument
   "runArgs": [
-    "--userns=keep-id" // Allows mapping to non-root user in rootless container (podman only)
+    // "--userns=keep-id" // Allows mapping to non-root user in rootless container (Podman only)
   ]
 }
