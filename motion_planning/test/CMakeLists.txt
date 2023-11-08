@@ -1,6 +1,8 @@
 add_executable(libwheel_motion_planning_tests
   test_space.cpp
+  test_type_traits.cpp
   test_make_vector.cpp
+  test_orthotope.cpp
 )
 
 target_link_libraries(libwheel_motion_planning_tests
