@@ -1,33 +1,19 @@
-include(GoogleTest)
-
-add_executable(unit_tests
+add_executable(libwheel_motion_planning_tests
   test_space.cpp
+  test_make_vector.cpp
 )
 
-target_link_libraries(unit_tests
+target_link_libraries(libwheel_motion_planning_tests
   PRIVATE
     libwheel::motion_planning
     GTest::gtest
     GTest::gtest_main
 )
 
-target_compile_options(unit_tests
+libwheel_target_set_compiler_warnings(libwheel_motion_planning_tests
   PRIVATE
-    -Wall
-    -Wextra
-    -Wshadow
-    -Wnon-virtual-dtor
-    -Wpedantic
-    -Wold-style-cast
-    -Wunused
-    -Wconversion
-    -Wsign-conversion
-    -Wcast-align
-    -Woverloaded-virtual
-    -Wdouble-promotion
-    -Wformat=2
-    -Wimplicit-fallthrough
-    -Werror
+  COMPILE_WARNING_AS_ERROR TRUE
 )
 
-gtest_discover_tests(unit_tests)
+include(GoogleTest)
+gtest_discover_tests(libwheel_motion_planning_tests)
