@@ -1,5 +1,3 @@
-add_subdirectory(custom_vector_type)
-
 add_executable(rrt rrt.cpp)
 
 target_include_directories(rrt
