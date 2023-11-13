@@ -1,17 +1,19 @@
-add_library(wheel_angleLibrary INTERFACE)
-add_library(libwheel::angle ALIAS wheel_angleLibrary)
+include(GNUInstallDirs)
 
-target_include_directories(wheel_angleLibrary
+add_library(wheel_angle INTERFACE)
+add_library(libwheel::angle ALIAS wheel_angle)
+
+target_include_directories(wheel_angle
   INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/angle>
 )
 
-target_compile_features(wheel_angleLibrary
+target_compile_features(wheel_angle
   INTERFACE
     cxx_std_20
 )
 
-target_compile_options(wheel_angleLibrary
+target_compile_options(wheel_angle
   INTERFACE
     -Wall
     -Wextra
@@ -30,11 +32,11 @@ target_compile_options(wheel_angleLibrary
     -Werror
 )
 
-set_target_properties(wheel_angleLibrary PROPERTIES
+set_target_properties(wheel_angle PROPERTIES
   EXPORT_NAME angle
 )
 
-install(TARGETS wheel_angleLibrary
+install(TARGETS wheel_angle
   EXPORT wheel_angleTargets
   INCLUDES
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}

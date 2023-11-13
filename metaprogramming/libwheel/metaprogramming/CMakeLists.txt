@@ -1,23 +1,23 @@
 include(GNUInstallDirs)
 
-add_library(wheel_metaprogrammingLibrary INTERFACE)
-add_library(libwheel::metaprogramming ALIAS wheel_metaprogrammingLibrary)
+add_library(wheel_metaprogramming INTERFACE)
+add_library(libwheel::metaprogramming ALIAS wheel_metaprogramming)
 
-target_include_directories(wheel_metaprogrammingLibrary
+target_include_directories(wheel_metaprogramming
   INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/metaprogramming>
 )
 
-target_compile_features(wheel_metaprogrammingLibrary
+target_compile_features(wheel_metaprogramming
   INTERFACE
     cxx_std_20
 )
 
-set_target_properties(wheel_metaprogrammingLibrary PROPERTIES
+set_target_properties(wheel_metaprogramming PROPERTIES
   EXPORT_NAME metaprogramming
 )
 
-install(TARGETS wheel_metaprogrammingLibrary
+install(TARGETS wheel_metaprogramming
   EXPORT wheel_metaprogrammingTargets
   INCLUDES
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
