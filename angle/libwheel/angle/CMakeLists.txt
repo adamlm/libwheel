@@ -1,19 +1,19 @@
-include(GNUInstallDirs)
+include(libwheel_target_set_install_rules)
 
-add_library(wheel_angle INTERFACE)
-add_library(libwheel::angle ALIAS wheel_angle)
+add_library(libwheel_angle INTERFACE)
+add_library(libwheel::angle ALIAS libwheel_angle)
 
-target_include_directories(wheel_angle
+target_include_directories(libwheel_angle
   INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/angle>
 )
 
-target_compile_features(wheel_angle
+target_compile_features(libwheel_angle
   INTERFACE
     cxx_std_20
 )
 
-target_compile_options(wheel_angle
+target_compile_options(libwheel_angle
   INTERFACE
     -Wall
     -Wextra
@@ -32,23 +32,4 @@ target_compile_options(wheel_angle
     -Werror
 )
 
-set_target_properties(wheel_angle PROPERTIES
-  EXPORT_NAME angle
-)
-
-install(TARGETS wheel_angle
-  EXPORT wheel_angleTargets
-  INCLUDES
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(DIRECTORY $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/>
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libwheel/angle
-  FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(EXPORT wheel_angleTargets
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libwheel_angle
-  FILE libwheel_angleTargets.cmake
-  NAMESPACE libwheel::
-)
+libwheel_target_set_install_rules(libwheel_angle)
