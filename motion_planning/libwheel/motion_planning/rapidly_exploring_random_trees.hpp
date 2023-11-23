@@ -11,6 +11,7 @@
 
 #include "libwheel/motion_planning/detail/boost_graph_extensions.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
+#include "libwheel/motion_planning/iteration_count.hpp"
 #include "libwheel/motion_planning/sampling.hpp"
 #include "libwheel/motion_planning/type_traits.hpp"
 
@@ -88,7 +89,7 @@ struct default_rrt_visitor {
 
 class RapidlyExploringRandomTrees {
   public:
-    explicit RapidlyExploringRandomTrees(std::size_t const &max_iterations) : max_iterations_{max_iterations} {}
+    explicit RapidlyExploringRandomTrees(IterationCount const &max_iterations) : max_iterations_{max_iterations} {}
 
     template <typename Space>
     constexpr auto operator()(Space const &space, vector_type_t<Space> const &start, auto const &goal_region) const {
@@ -112,7 +113,7 @@ class RapidlyExploringRandomTrees {
         auto const source_vertex{boost::add_vertex(start, tree)};
 
         for ([[maybe_unused]] auto const batch : ranges::views::iota(0U, 100U)) {
-            for ([[maybe_unused]] auto const iteration : ranges::views::iota(0U, max_iterations_)) {
+            for ([[maybe_unused]] auto const iteration : ranges::views::iota(0U, max_iterations_.count)) {
                 try {
                     auto const sample{sampler.sample_space()};
 
@@ -141,7 +142,7 @@ class RapidlyExploringRandomTrees {
     }
 
   private:
-    std::size_t max_iterations_{0U};
+    IterationCount max_iterations_{0U};
 };
 
 } // namespace wheel::motion_planning
