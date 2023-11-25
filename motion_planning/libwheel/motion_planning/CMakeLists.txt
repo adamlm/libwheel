@@ -12,6 +12,7 @@ target_link_libraries(libwheel_motion_planning
   INTERFACE
     Boost::graph
     libwheel::metaprogramming
+    range-v3::range-v3
 )
 
 target_compile_features(libwheel_motion_planning
