@@ -1,22 +1,22 @@
-add_executable(rapidly_exploring_random_trees rapidly_exploring_random_trees.cpp)
+add_executable(rrt_simple rrt_simple.cpp)
 
-target_include_directories(rapidly_exploring_random_trees
+target_include_directories(rrt_simple
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
 )
 
-target_link_libraries(rapidly_exploring_random_trees
+target_link_libraries(rrt_simple
   PRIVATE
     libwheel::motion_planning
     fmt::fmt
 )
 
-target_compile_features(rapidly_exploring_random_trees
+target_compile_features(rrt_simple
   PRIVATE
     cxx_std_20
 )
 
-libwheel_target_set_compiler_warnings(rapidly_exploring_random_trees
+libwheel_target_set_compiler_warnings(rrt_simple
   PRIVATE
   WARNINGS_AS_ERRORS
 )
