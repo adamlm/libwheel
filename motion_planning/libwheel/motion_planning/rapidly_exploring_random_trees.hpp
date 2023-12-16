@@ -10,6 +10,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 
 #include "libwheel/motion_planning/detail/boost_graph_extensions.hpp"
+#include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/iteration_count.hpp"
 #include "libwheel/motion_planning/sampling.hpp"
@@ -155,6 +156,58 @@ class RapidlyExploringRandomTrees {
 
   private:
     IterationCount max_iterations_{0U};
+};
+struct incremental_sample_and_search_algorithm_category {};
+
+template <>
+struct customization::do_find_path<incremental_sample_and_search_algorithm_category> {
+    template <typename Space, typename Strategy, typename Visitor>
+    static auto _(Space const &space, vector_type_t<Space> const &start, auto const &goal_region,
+                  Strategy const &strategy, Visitor const &visitor)
+        -> std::optional<std::vector<vector_type_t<Space>>> {
+        if (!is_within(start, space)) {
+            throw std::invalid_argument("start point not within space");
+        }
+
+        if (!is_within(goal_region, space)) {
+            throw std::invalid_argument("goal region not within space");
+        }
+
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, vector_type_t<Space>> tree;
+        auto const index_map{boost::get(boost::vertex_index, tree)};
+
+        using Node = GraphNode<vector_type_t<Space>>;
+        auto const source_vertex{boost::add_vertex(start, tree)};
+        visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
+
+        typename Strategy::template sampler_type<Space> sampler{space};
+        for (auto remaining_expansions{strategy.get_max_expansions().count}; remaining_expansions > 0;) {
+            for (auto _{0U}; _ < std::min(strategy.get_search_period().count, remaining_expansions);
+                 ++_, --remaining_expansions) {
+                auto const sample{sampler.sample_space()};
+                auto const selected_vertex{strategy.do_select_vertex(sample, tree)};
+                auto const local_path{strategy.do_plan_local_path(tree[selected_vertex], sample)};
+
+                auto const stopping_vertex{boost::add_vertex(*std::crbegin(local_path), tree)};
+                visitor.on_add_node(Node{index_map[stopping_vertex], tree[stopping_vertex]});
+
+                boost::add_edge(selected_vertex, stopping_vertex, tree);
+                visitor.on_add_edge(Node{index_map[selected_vertex], tree[selected_vertex]},
+                                    Node{index_map[stopping_vertex], tree[stopping_vertex]});
+            }
+
+            if (auto const vertex_path{detail::find_path_in_graph(tree, source_vertex, goal_region)}; vertex_path) {
+                std::vector<vector_type_t<Space>> vector_path;
+                for (auto const &vertex_descriptor : vertex_path.value()) {
+                    vector_path.push_back(tree[vertex_descriptor]);
+                }
+
+                return vector_path;
+            }
+        }
+
+        throw std::runtime_error("exceeded maximum number of expansions");
+    }
 };
 
 } // namespace wheel::motion_planning
