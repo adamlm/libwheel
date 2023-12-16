@@ -52,12 +52,12 @@ auto main() -> int {
 
     std::ofstream tree_nodes_output{results_directory / "search_tree_nodes.csv"};
     std::ofstream tree_edges_output{results_directory / "search_tree_edges.csv"};
-    wheel::motion_planning::RapidlyExploringRandomTrees rrt{wheel_mp::IterationCount{1U}};
+    auto const result = wheel_mp::find_path(search_space, point_t(0.1, 0.1), goal_region,
+                                            wheel_mp::SimpleRrt{wheel_mp::MaxExpansions{100U}},
+                                            RrtRecorderVisitor{tree_nodes_output, tree_edges_output});
 
     fmt::print("rrt_simple: searching for path\n");
-    if (auto const result{rrt(search_space, point_t(0.1, 0.1), goal_region,
-                              RrtRecorderVisitor{tree_nodes_output, tree_edges_output})};
-        result) {
+    if (result) {
         fmt::print("rrt_simple: path found\n");
 
         std::ofstream path_file{results_directory / "planned_path.csv"};

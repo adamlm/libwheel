@@ -105,69 +105,6 @@ struct null_rrt_visitor {
     auto on_add_edge(auto const & /* source */, auto const & /* target */) const noexcept -> void {}
 };
 
-class RapidlyExploringRandomTrees {
-  public:
-    explicit RapidlyExploringRandomTrees(IterationCount const &max_iterations) : max_iterations_{max_iterations} {}
-
-    template <typename Space>
-    constexpr auto operator()(Space const &space, vector_type_t<Space> const &start, auto const &goal_region) const {
-        return this->operator()(space, start, goal_region, null_rrt_visitor{});
-    }
-
-    template <typename Space, typename Visitor>
-    constexpr auto operator()(Space const &space, vector_type_t<Space> const &start, auto const &goal_region,
-                              Visitor const &visitor) const -> std::optional<std::vector<vector_type_t<Space>>> {
-        using Node = GraphNode<vector_type_t<Space>>;
-
-        if (!is_within(start, space)) {
-            throw std::invalid_argument("start point not within space");
-        }
-
-        if (!is_within(goal_region, space)) {
-            throw std::invalid_argument("goal region not within space");
-        }
-
-        UniformSampler<Space> sampler{space};
-
-        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, vector_type_t<Space>> tree;
-        auto const index_map{boost::get(boost::vertex_index, tree)};
-        auto const source_vertex{boost::add_vertex(start, tree)};
-        visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
-
-        for ([[maybe_unused]] auto const batch : ranges::views::iota(0U, 100U)) {
-            for ([[maybe_unused]] auto const iteration : ranges::views::iota(0U, max_iterations_.count)) {
-                try {
-                    auto const sample{sampler.sample_space()};
-
-                    auto const nearest_vertex{detail::get_nearest_vertex(sample, tree)};
-                    auto const sample_vertex{boost::add_vertex(sample, tree)};
-                    visitor.on_add_node(GraphNode<vector_type_t<Space>>{index_map[sample_vertex], tree[sample_vertex]});
-
-                    boost::add_edge(nearest_vertex, sample_vertex, tree);
-                    visitor.on_add_edge(Node{index_map[nearest_vertex], tree[nearest_vertex]},
-                                        Node{index_map[sample_vertex], tree[sample_vertex]});
-                } catch (SamplingError const &) {
-                    return std::nullopt;
-                }
-            }
-
-            if (auto const vertex_path{detail::find_path_in_graph(tree, source_vertex, goal_region)}; vertex_path) {
-                std::vector<vector_type_t<Space>> vector_path;
-                for (auto const &vertex_descriptor : vertex_path.value()) {
-                    vector_path.push_back(tree[vertex_descriptor]);
-                }
-
-                return vector_path;
-            }
-        }
-
-        return std::nullopt;
-    }
-
-  private:
-    IterationCount max_iterations_{0U};
-};
-
 struct SearchPeriod {
     std::size_t count;
 };
