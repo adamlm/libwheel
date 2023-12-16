@@ -3,9 +3,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <ranges>
 
 #include <range/v3/view/iota.hpp>
 
+#include <boost/geometry/algorithms/distance.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 
@@ -20,10 +22,18 @@ namespace wheel::motion_planning {
 
 namespace detail {
 
-auto get_nearest_vertex(auto const &point, boost_graph auto const &graph) {
-    (void)point;
+auto get_nearest_vertex(auto const &point, boost_graph auto const &graph, auto const &distance_metric) {
     auto const [graph_cbegin, graph_cend] = boost::vertices(graph);
-    return *std::ranges::min_element(graph_cbegin, graph_cend, [](auto const &, auto const &) { return true; });
+    return *std::ranges::min_element(graph_cbegin, graph_cend,
+                                     [&graph = std::as_const(graph), &distance_metric = std::as_const(distance_metric),
+                                      &point = std::as_const(point)](auto const &a, auto const &b) {
+                                         return distance_metric(point, graph[a]) < distance_metric(point, graph[b]);
+                                     });
+}
+
+auto get_nearest_vertex(auto const &point, boost_graph auto const &graph) {
+    return get_nearest_vertex(point, graph,
+                              [](auto const &a, auto const &b) { return boost::geometry::distance(a, b); });
 }
 
 template <typename Region, typename Tag>
@@ -157,7 +167,50 @@ class RapidlyExploringRandomTrees {
   private:
     IterationCount max_iterations_{0U};
 };
+
+struct SearchPeriod {
+    std::size_t count;
+};
+
+struct MaxExpansions {
+    std::size_t count;
+};
+
+class SimpleRrt {
+  public:
+    template <typename Space>
+    using sampler_type = UniformSampler<Space>;
+
+    constexpr explicit SimpleRrt(MaxExpansions const &max_expansions, SearchPeriod const &search_period)
+        : max_expansions_{max_expansions}, search_period_{search_period} {}
+
+    constexpr explicit SimpleRrt(MaxExpansions const &max_expansions) : max_expansions_{max_expansions} {}
+
+    constexpr auto get_max_expansions() const noexcept -> MaxExpansions { return max_expansions_; }
+
+    constexpr auto get_search_period() const noexcept -> SearchPeriod { return search_period_; }
+
+    auto do_select_vertex(auto const &sample, auto const &tree) const noexcept {
+        return detail::get_nearest_vertex(sample, tree);
+    }
+
+    template <typename Point>
+    auto do_plan_local_path(Point const & /* source */, Point const &target) const -> std::vector<Point> {
+        return {target};
+    }
+
+  private:
+    MaxExpansions max_expansions_{0U};
+    SearchPeriod search_period_{1U};
+};
+
 struct incremental_sample_and_search_algorithm_category {};
+
+template <>
+struct customization::search_algorithm_category_impl<SimpleRrt> {
+    using type = incremental_sample_and_search_algorithm_category;
+};
+
 
 template <>
 struct customization::do_find_path<incremental_sample_and_search_algorithm_category> {
