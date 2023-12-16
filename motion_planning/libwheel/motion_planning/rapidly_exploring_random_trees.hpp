@@ -3,13 +3,16 @@
 
 #include <algorithm>
 #include <cmath>
+#include <ranges>
 
 #include <range/v3/view/iota.hpp>
 
+#include <boost/geometry/algorithms/distance.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 
 #include "libwheel/motion_planning/detail/boost_graph_extensions.hpp"
+#include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/iteration_count.hpp"
 #include "libwheel/motion_planning/sampling.hpp"
@@ -19,10 +22,18 @@ namespace wheel::motion_planning {
 
 namespace detail {
 
-auto get_nearest_vertex(auto const &point, boost_graph auto const &graph) {
-    (void)point;
+auto get_nearest_vertex(auto const &point, boost_graph auto const &graph, auto const &distance_metric) {
     auto const [graph_cbegin, graph_cend] = boost::vertices(graph);
-    return *std::ranges::min_element(graph_cbegin, graph_cend, [](auto const &, auto const &) { return true; });
+    return *std::ranges::min_element(graph_cbegin, graph_cend,
+                                     [&graph = std::as_const(graph), &distance_metric = std::as_const(distance_metric),
+                                      &point = std::as_const(point)](auto const &a, auto const &b) {
+                                         return distance_metric(point, graph[a]) < distance_metric(point, graph[b]);
+                                     });
+}
+
+auto get_nearest_vertex(auto const &point, boost_graph auto const &graph) {
+    return get_nearest_vertex(point, graph,
+                              [](auto const &a, auto const &b) { return boost::geometry::distance(a, b); });
 }
 
 template <typename Region, typename Tag>
@@ -94,20 +105,56 @@ struct null_rrt_visitor {
     auto on_add_edge(auto const & /* source */, auto const & /* target */) const noexcept -> void {}
 };
 
-class RapidlyExploringRandomTrees {
-  public:
-    explicit RapidlyExploringRandomTrees(IterationCount const &max_iterations) : max_iterations_{max_iterations} {}
+struct SearchPeriod {
+    std::size_t count;
+};
 
+struct MaxExpansions {
+    std::size_t count;
+};
+
+class SimpleRrt {
+  public:
     template <typename Space>
-    constexpr auto operator()(Space const &space, vector_type_t<Space> const &start, auto const &goal_region) const {
-        return this->operator()(space, start, goal_region, null_rrt_visitor{});
+    using sampler_type = UniformSampler<Space>;
+
+    constexpr explicit SimpleRrt(MaxExpansions const &max_expansions, SearchPeriod const &search_period)
+        : max_expansions_{max_expansions}, search_period_{search_period} {}
+
+    constexpr explicit SimpleRrt(MaxExpansions const &max_expansions) : max_expansions_{max_expansions} {}
+
+    constexpr auto get_max_expansions() const noexcept -> MaxExpansions { return max_expansions_; }
+
+    constexpr auto get_search_period() const noexcept -> SearchPeriod { return search_period_; }
+
+    auto do_select_vertex(auto const &sample, auto const &tree) const noexcept {
+        return detail::get_nearest_vertex(sample, tree);
     }
 
-    template <typename Space, typename Visitor>
-    constexpr auto operator()(Space const &space, vector_type_t<Space> const &start, auto const &goal_region,
-                              Visitor const &visitor) const -> std::optional<std::vector<vector_type_t<Space>>> {
-        using Node = GraphNode<vector_type_t<Space>>;
+    template <typename Point>
+    auto do_plan_local_path(Point const & /* source */, Point const &target) const -> std::vector<Point> {
+        return {target};
+    }
 
+  private:
+    MaxExpansions max_expansions_{0U};
+    SearchPeriod search_period_{1U};
+};
+
+struct incremental_sample_and_search_algorithm_category {};
+
+template <>
+struct customization::search_algorithm_category_impl<SimpleRrt> {
+    using type = incremental_sample_and_search_algorithm_category;
+};
+
+
+template <>
+struct customization::do_find_path<incremental_sample_and_search_algorithm_category> {
+    template <typename Space, typename Strategy, typename Visitor>
+    static auto _(Space const &space, vector_type_t<Space> const &start, auto const &goal_region,
+                  Strategy const &strategy, Visitor const &visitor)
+        -> std::optional<std::vector<vector_type_t<Space>>> {
         if (!is_within(start, space)) {
             throw std::invalid_argument("start point not within space");
         }
@@ -116,28 +163,27 @@ class RapidlyExploringRandomTrees {
             throw std::invalid_argument("goal region not within space");
         }
 
-        UniformSampler<Space> sampler{space};
-
         boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, vector_type_t<Space>> tree;
         auto const index_map{boost::get(boost::vertex_index, tree)};
+
+        using Node = GraphNode<vector_type_t<Space>>;
         auto const source_vertex{boost::add_vertex(start, tree)};
         visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
 
-        for ([[maybe_unused]] auto const batch : ranges::views::iota(0U, 100U)) {
-            for ([[maybe_unused]] auto const iteration : ranges::views::iota(0U, max_iterations_.count)) {
-                try {
-                    auto const sample{sampler.sample_space()};
+        typename Strategy::template sampler_type<Space> sampler{space};
+        for (auto remaining_expansions{strategy.get_max_expansions().count}; remaining_expansions > 0;) {
+            for (auto _{0U}; _ < std::min(strategy.get_search_period().count, remaining_expansions);
+                 ++_, --remaining_expansions) {
+                auto const sample{sampler.sample_space()};
+                auto const selected_vertex{strategy.do_select_vertex(sample, tree)};
+                auto const local_path{strategy.do_plan_local_path(tree[selected_vertex], sample)};
 
-                    auto const nearest_vertex{detail::get_nearest_vertex(sample, tree)};
-                    auto const sample_vertex{boost::add_vertex(sample, tree)};
-                    visitor.on_add_node(GraphNode<vector_type_t<Space>>{index_map[sample_vertex], tree[sample_vertex]});
+                auto const stopping_vertex{boost::add_vertex(*std::crbegin(local_path), tree)};
+                visitor.on_add_node(Node{index_map[stopping_vertex], tree[stopping_vertex]});
 
-                    boost::add_edge(nearest_vertex, sample_vertex, tree);
-                    visitor.on_add_edge(Node{index_map[nearest_vertex], tree[nearest_vertex]},
-                                        Node{index_map[sample_vertex], tree[sample_vertex]});
-                } catch (SamplingError const &) {
-                    return std::nullopt;
-                }
+                boost::add_edge(selected_vertex, stopping_vertex, tree);
+                visitor.on_add_edge(Node{index_map[selected_vertex], tree[selected_vertex]},
+                                    Node{index_map[stopping_vertex], tree[stopping_vertex]});
             }
 
             if (auto const vertex_path{detail::find_path_in_graph(tree, source_vertex, goal_region)}; vertex_path) {
@@ -150,11 +196,8 @@ class RapidlyExploringRandomTrees {
             }
         }
 
-        return std::nullopt;
+        throw std::runtime_error("exceeded maximum number of expansions");
     }
-
-  private:
-    IterationCount max_iterations_{0U};
 };
 
 } // namespace wheel::motion_planning
