@@ -92,6 +92,43 @@ auto find_path_in_graph(Graph const &graph, vertex_descriptor_t<Graph> const &so
     return std::nullopt;
 }
 
+struct MaxStepSize {
+    double value{1U};
+};
+
+template <typename Point>
+auto interpolate_between(Point const &source, Point const &target, MaxStepSize max_step_size) noexcept
+    -> std::vector<Point> {
+
+    auto const num_steps{std::ceil(boost::geometry::distance(source, target) / max_step_size.value)};
+    auto const normalized_step_size{1.0 / num_steps};
+
+    std::vector<Point> points;
+    for (auto i{0.0}; i < 1.0; i += normalized_step_size) {
+        auto scaled_source{source};
+        boost::geometry::multiply_value(scaled_source, 1 - i);
+
+        auto scaled_target{target};
+        boost::geometry::multiply_value(scaled_target, i);
+
+        boost::geometry::add_point(scaled_source, scaled_target);
+        points.push_back(scaled_source);
+    }
+
+    return points;
+}
+
+template <std::ranges::input_range Range, typename UnaryPredicate>
+constexpr auto find_stopping_point(Range &&r, UnaryPredicate should_stop) noexcept
+    -> std::optional<std::ranges::range_value_t<Range>> {
+    if (auto const one_past_stop{std::find_if(std::ranges::begin(r), std::ranges::end(r), should_stop)};
+        one_past_stop != std::cbegin(r)) {
+        return *std::prev(one_past_stop);
+    }
+
+    return std::nullopt;
+}
+
 } // namespace detail
 
 template <typename Value>
@@ -141,6 +178,47 @@ class SimpleRrt {
     SearchPeriod search_period_{1U};
 };
 
+struct MaxDistance {
+    double value;
+};
+
+class MaxDistanceRrt {
+  public:
+    template <typename Space>
+    using sampler_type = UniformSampler<Space>;
+
+    constexpr explicit MaxDistanceRrt(MaxExpansions max_expansions, SearchPeriod search_period,
+                                      MaxDistance max_distance)
+        : max_expansions_{max_expansions}, search_period_{search_period}, max_distance_{max_distance} {}
+
+    constexpr explicit MaxDistanceRrt(MaxExpansions max_expansions) : max_expansions_{max_expansions} {}
+
+    constexpr auto get_max_expansions() const noexcept -> MaxExpansions { return max_expansions_; }
+
+    constexpr auto get_search_period() const noexcept -> SearchPeriod { return search_period_; }
+
+    auto do_select_vertex(auto const &sample, auto const &tree) const noexcept {
+        return detail::get_nearest_vertex(sample, tree);
+    }
+
+    template <typename Point>
+    auto do_plan_local_path(Point const &source, Point const &target) const -> std::vector<Point> {
+        auto const is_too_far_from_start = [&source = std::as_const(source), this](auto const &point) {
+            return boost::geometry::distance(source, point) >= this->max_distance_.value;
+        };
+
+        auto const stopping_point{detail::find_stopping_point(
+            detail::interpolate_between(source, target, detail::MaxStepSize{0.1}), is_too_far_from_start)};
+
+        return {stopping_point.value()};
+    }
+
+  private:
+    MaxExpansions max_expansions_{0U};
+    SearchPeriod search_period_{1U};
+    MaxDistance max_distance_{0.5};
+};
+
 struct incremental_sample_and_search_algorithm_category {};
 
 template <>
@@ -148,6 +226,10 @@ struct customization::search_algorithm_category_impl<SimpleRrt> {
     using type = incremental_sample_and_search_algorithm_category;
 };
 
+template <>
+struct customization::search_algorithm_category_impl<MaxDistanceRrt> {
+    using type = incremental_sample_and_search_algorithm_category;
+};
 
 template <>
 struct customization::do_find_path<incremental_sample_and_search_algorithm_category> {
