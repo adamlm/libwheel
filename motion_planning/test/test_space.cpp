@@ -16,7 +16,7 @@ TEST(SpaceTest, TestGetBoundRanges) {
 
     const auto bounds{space.get_bound_ranges()};
 
-    EXPECT_DOUBLE_EQ(bounds.at(0).lower.get(), x_bounds.lower.get());
-    EXPECT_DOUBLE_EQ(bounds.at(1).lower.get(), y_bounds.lower.get());
-    EXPECT_DOUBLE_EQ(bounds.at(2).lower.get(), z_bounds.lower.get());
+    EXPECT_DOUBLE_EQ(bounds.at(0).lower.value, x_bounds.lower.value);
+    EXPECT_DOUBLE_EQ(bounds.at(1).lower.value, y_bounds.lower.value);
+    EXPECT_DOUBLE_EQ(bounds.at(2).lower.value, z_bounds.lower.value);
 }

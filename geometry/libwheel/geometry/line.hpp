@@ -3,15 +3,22 @@
 
 #include "libwheel/geometry/linear_equation.hpp"
 #include "libwheel/geometry/point_2d.hpp"
-#include "libwheel/geometry/tagged_value.hpp"
 
 namespace wheel {
 
 using Line = LinearEquation<2>;
 
-using Slope = TaggedValue<float, struct SlopeTag>;
-using YIntercept = TaggedValue<float, struct YInterceptTag>;
-using XIntercept = TaggedValue<float, struct XInterceptTag>;
+struct Slope {
+    float value;
+};
+
+struct YIntercept {
+    float value;
+};
+
+struct XIntercept {
+    float value;
+};
 
 /**
  * Construct a line specified in slope-intercept form.
