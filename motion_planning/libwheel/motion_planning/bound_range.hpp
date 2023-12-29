@@ -3,19 +3,21 @@
 
 #include <cassert>
 
-#include "libwheel/motion_planning/tagged_value.hpp"
-
 namespace wheel {
 
 /**
  * @brief Wrapped type representing a BoundRange's lower bound
  */
-using LowerBound = TaggedValue<double, struct LowerBoundTag>;
+struct LowerBound {
+    double value;
+};
 
 /**
  * @brief Wrapped type representing a BoundRange's upper bound
  */
-using UpperBound = TaggedValue<double, struct UpperBoundTag>;
+struct UpperBound {
+    double value;
+};
 
 /**
  * @brief One-dimensional bounded range between [lower, upper] (inclusive)
@@ -31,7 +33,7 @@ struct BoundRange {
      * @param u Upper range value
      */
     explicit BoundRange(LowerBound l, UpperBound u) : lower{l}, upper{u} {
-        assert((lower.get() <= upper.get()) && "lower bound must be <= upper bound");
+        assert((lower.value <= upper.value) && "lower bound must be <= upper bound");
     }
 
     LowerBound lower;
