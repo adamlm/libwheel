@@ -11,6 +11,6 @@ Checks: >-
     portability-*,
     readability-*
 FormatStyle: 'file'
-HeaderFilterRegex: ''
+HeaderFilterRegex: '.*'
 WarningsAsErrors: '*'
 ...
