@@ -1,9 +1,5 @@
 include(options.cmake)
 
-if(NOT libwheel_motion_planning_BUILD_LIB)
-  return()
-endif()
-
 add_subdirectory(libwheel/motion_planning)
 
 if(wheel_motion_planning_ENABLE_TESTING OR PROJECT_IS_TOP_LEVEL)
