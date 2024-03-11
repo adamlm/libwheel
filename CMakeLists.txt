@@ -12,8 +12,10 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ${libwheel_EXPORT_COMPILE_COMMANDS})
 
-add_subdirectory(angle)
-add_subdirectory(geometry)
-add_subdirectory(metaprogramming)
-add_subdirectory(motion_planning)
-add_subdirectory(strongly_typed_matrix)
+include(libwheel_conditionally_add_to_build)
+
+libwheel_conditionally_add_to_build(angle libwheel_angle_BUILD_LIB)
+libwheel_conditionally_add_to_build(geometry libwheel_geometry_BUILD_LIB)
+libwheel_conditionally_add_to_build(metaprogramming libwheel_metaprogramming_BUILD_LIB)
+libwheel_conditionally_add_to_build(motion_planning libwheel_motion_planning_BUILD_LIB)
+libwheel_conditionally_add_to_build(strongly_typed_matrix libwheel_strongly_typed_matrix_BUILD_LIB)
