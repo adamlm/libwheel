@@ -10,8 +10,9 @@
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <libwheel/boost_graph_extensions/exceptions.hpp>
+#include <libwheel/boost_graph_extensions/type_traits.hpp>
 
-#include "libwheel/motion_planning/detail/boost_graph_extensions.hpp"
 #include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/iteration_count.hpp"
@@ -22,7 +23,8 @@ namespace wheel::motion_planning {
 
 namespace detail {
 
-auto get_nearest_vertex(auto const &point, boost_graph auto const &graph, auto const &distance_metric) {
+auto get_nearest_vertex(auto const &point, wheel::boost_graph_extensions::boost_graph auto const &graph,
+                        auto const &distance_metric) {
     auto const [graph_cbegin, graph_cend] = boost::vertices(graph);
     return *std::ranges::min_element(graph_cbegin, graph_cend,
                                      [&graph = std::as_const(graph), &distance_metric = std::as_const(distance_metric),
@@ -31,7 +33,7 @@ auto get_nearest_vertex(auto const &point, boost_graph auto const &graph, auto c
                                      });
 }
 
-auto get_nearest_vertex(auto const &point, boost_graph auto const &graph) {
+auto get_nearest_vertex(auto const &point, wheel::boost_graph_extensions::boost_graph auto const &graph) {
     return get_nearest_vertex(point, graph,
                               [](auto const &a, auto const &b) { return boost::geometry::distance(a, b); });
 }
@@ -43,10 +45,10 @@ class is_within_goal_checker : public boost::base_visitor<is_within_goal_checker
 
     explicit is_within_goal_checker(Region const &r) : region_{r} {}
 
-    template <detail::boost_graph Graph>
-    auto operator()(edge_descriptor_t<Graph> e, Graph const &g) const -> void {
+    template <wheel::boost_graph_extensions::boost_graph Graph>
+    auto operator()(wheel::boost_graph_extensions::edge_descriptor_t<Graph> e, Graph const &g) const -> void {
         if (auto const v{boost::target(e, g)}; motion_planning::is_within(g[v], region_)) {
-            throw detail::early_search_termination<Graph>("found goal region", v);
+            throw wheel::boost_graph_extensions::early_search_termination<Graph>("found goal region", v);
         }
     }
 
@@ -59,15 +61,15 @@ auto check_is_within_goal(Region const &region, Tag /* tag */) noexcept -> is_wi
     return is_within_goal_checker<Region, Tag>{region};
 }
 
-template <detail::boost_graph Graph>
-using VertexPath = std::vector<vertex_descriptor_t<Graph>>;
+template <wheel::boost_graph_extensions::boost_graph Graph>
+using VertexPath = std::vector<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>;
 
-template <detail::boost_graph Graph, typename GoalRegion>
-    requires std::same_as<vector_type_t<GoalRegion>, detail::vertex_bundle_t<Graph>>
+template <wheel::boost_graph_extensions::boost_graph Graph, typename GoalRegion>
+    requires std::same_as<vector_type_t<GoalRegion>, wheel::boost_graph_extensions::vertex_bundle_t<Graph>>
 [[nodiscard]]
-auto find_path_in_graph(Graph const &graph, vertex_descriptor_t<Graph> const &source,
+auto find_path_in_graph(Graph const &graph, wheel::boost_graph_extensions::vertex_descriptor_t<Graph> const &source,
                         GoalRegion const &goal_region) noexcept -> std::optional<VertexPath<Graph>> {
-    using PredecessorList = std::vector<std::optional<vertex_descriptor_t<Graph>>>;
+    using PredecessorList = std::vector<std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>>;
     PredecessorList predecessors(boost::num_vertices(graph), std::nullopt);
 
     auto const predecessor_recorder{boost::record_predecessors(predecessors.data(), boost::on_tree_edge{})};
@@ -76,9 +78,10 @@ auto find_path_in_graph(Graph const &graph, vertex_descriptor_t<Graph> const &so
 
     try {
         boost::breadth_first_search(graph, boost::vertex(source, graph), boost::visitor(visitor));
-    } catch (detail::early_search_termination<Graph> const &result) {
+    } catch (wheel::boost_graph_extensions::early_search_termination<Graph> const &result) {
         VertexPath<Graph> path;
-        for (std::optional<vertex_descriptor_t<Graph>> predecessor{result.get_last_vertex()};
+        for (std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> predecessor{
+                 result.get_last_vertex()};
              predecessor != std::nullopt;) {
             path.push_back(predecessor.value());
             predecessor = predecessors.at(predecessor.value());
