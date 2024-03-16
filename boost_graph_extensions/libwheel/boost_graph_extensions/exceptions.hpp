@@ -4,6 +4,7 @@
 #include <exception>
 
 #include "libwheel/boost_graph_extensions/concepts.hpp"
+#include "libwheel/boost_graph_extensions/type_traits.hpp"
 
 namespace wheel::boost_graph_extensions {
 
