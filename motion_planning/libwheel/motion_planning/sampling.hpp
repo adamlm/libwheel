@@ -6,13 +6,41 @@
 
 #include <range/v3/view.hpp>
 
-#include "libwheel/motion_planning/attempt_count.hpp"
 #include "libwheel/motion_planning/dimensional_bound.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/make_vector.hpp"
+#include "libwheel/motion_planning/orthotope.hpp"
 #include "libwheel/motion_planning/type_traits.hpp"
 
 namespace wheel::motion_planning {
+
+struct AttemptCount {
+    std::size_t attempts;
+
+    [[nodiscard]]
+    friend auto
+    operator<=>(AttemptCount const &, AttemptCount const &) noexcept = default;
+
+    friend auto operator++(AttemptCount &attempt_count) noexcept -> AttemptCount & {
+        ++attempt_count.attempts;
+        return attempt_count;
+    }
+
+    friend auto operator++(AttemptCount attempt_count, int /* dummy */) noexcept -> AttemptCount {
+        ++attempt_count;
+        return attempt_count;
+    }
+
+    friend auto operator--(AttemptCount &attempt_count) noexcept -> AttemptCount & {
+        --attempt_count.attempts;
+        return attempt_count;
+    }
+
+    friend auto operator--(AttemptCount attempt_count, int /* dummy */) noexcept -> AttemptCount {
+        --attempt_count;
+        return attempt_count;
+    }
+};
 
 struct SamplingError : std::runtime_error {
     using runtime_error::runtime_error;
