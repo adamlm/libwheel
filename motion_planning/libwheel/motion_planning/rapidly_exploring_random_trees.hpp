@@ -5,13 +5,12 @@
 #include <cmath>
 #include <ranges>
 
-#include <range/v3/view/iota.hpp>
-
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <libwheel/boost_graph_extensions/exceptions.hpp>
 #include <libwheel/boost_graph_extensions/type_traits.hpp>
+#include <range/v3/view/iota.hpp>
 
 #include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
@@ -78,6 +77,36 @@ auto find_path_in_graph(Graph const &graph, wheel::boost_graph_extensions::verte
 
     try {
         boost::breadth_first_search(graph, boost::vertex(source, graph), boost::visitor(visitor));
+    } catch (wheel::boost_graph_extensions::early_search_termination<Graph> const &result) {
+        VertexPath<Graph> path;
+        for (std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> predecessor{
+                 result.get_last_vertex()};
+             predecessor != std::nullopt;) {
+            path.push_back(predecessor.value());
+            predecessor = predecessors.at(predecessor.value());
+        }
+
+        std::ranges::reverse(path);
+
+        return path;
+    }
+
+    return std::nullopt;
+}
+
+template <wheel::boost_graph_extensions::boost_graph Graph, typename GoalRegion>
+    requires std::same_as<vector_type_t<GoalRegion>, wheel::boost_graph_extensions::vertex_bundle_t<Graph>>
+[[nodiscard]]
+auto search_for_vertex_path(Graph const &graph, wheel::boost_graph_extensions::vertex_descriptor_t<Graph> const &source,
+                            GoalRegion const &goal_region) noexcept -> std::optional<VertexPath<Graph>> {
+    using PredecessorList = std::vector<std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>>;
+    PredecessorList predecessors(boost::num_vertices(graph), std::nullopt);
+
+    try {
+        boost::breadth_first_search(graph, boost::vertex(source, graph),
+                                    boost::visitor(boost::make_bfs_visitor(std::pair{
+                                        boost::record_predecessors(predecessors.data(), boost::on_tree_edge{}),
+                                        check_is_within_goal(goal_region, boost::on_tree_edge{})})));
     } catch (wheel::boost_graph_extensions::early_search_termination<Graph> const &result) {
         VertexPath<Graph> path;
         for (std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> predecessor{
@@ -330,6 +359,55 @@ struct customization::do_find_path<incremental_sample_and_search_algorithm_categ
         throw std::runtime_error("exceeded maximum number of expansions");
     }
 };
+
+namespace detail {
+
+template <typename Graph>
+auto make_point_path(auto const &vertex_path, Graph const &graph) {
+    std::vector<wheel::boost_graph_extensions::vertex_bundle_t<Graph>> point_path;
+
+    for (auto const &vertex_descriptor : vertex_path) {
+        point_path.push_back(graph[vertex_descriptor]);
+    }
+
+    return point_path;
+}
+
+} // namespace detail
+
+struct ExpansionsPerSearch {
+    int value;
+};
+
+auto search_rrt(auto const &source, auto const &target, auto &sampler, auto const &vertex_selector,
+                auto const &local_planner, MaxExpansions max_expansions, ExpansionsPerSearch search_period)
+    -> std::optional<std::vector<std::remove_cvref_t<decltype(source)>>> {
+
+    // check for valid start and goal regions
+
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, std::remove_cvref_t<decltype(source)>> tree;
+    auto const source_vertex{boost::add_vertex(source, tree)};
+
+    for (auto const &expansion_count : ranges::views::iota(0U, max_expansions.count)) {
+        auto const sample{sampler.sample_space()};
+        auto const selected_vertex{vertex_selector(tree, sample)};
+
+        auto const local_path{local_planner(tree[selected_vertex], sample)};
+        auto const stopping_vertex{boost::add_vertex(local_path.back(), tree)};
+
+        boost::add_edge(selected_vertex, stopping_vertex, tree);
+
+        if (static_cast<int>(expansion_count) % search_period.value != 0) {
+            continue;
+        }
+
+        if (auto const vertex_path{detail::search_for_vertex_path(tree, source_vertex, target)}) {
+            return detail::make_point_path(vertex_path.value(), tree);
+        }
+    }
+
+    return std::nullopt;
+}
 
 } // namespace wheel::motion_planning
 
