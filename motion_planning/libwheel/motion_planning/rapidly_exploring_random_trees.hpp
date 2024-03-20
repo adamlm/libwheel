@@ -12,6 +12,7 @@
 #include <libwheel/boost_graph_extensions/type_traits.hpp>
 #include <range/v3/view/iota.hpp>
 
+#include "libwheel/motion_planning/detail/interpolate_between.hpp"
 #include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/iteration_count.hpp"
@@ -119,43 +120,6 @@ auto search_for_vertex_path(Graph const &graph, wheel::boost_graph_extensions::v
         std::ranges::reverse(path);
 
         return path;
-    }
-
-    return std::nullopt;
-}
-
-struct MaxStepSize {
-    double value{1U};
-};
-
-template <typename Point>
-auto interpolate_between(Point const &source, Point const &target, MaxStepSize max_step_size) noexcept
-    -> std::vector<Point> {
-
-    auto const num_steps{std::ceil(boost::geometry::distance(source, target) / max_step_size.value)};
-    auto const normalized_step_size{1.0 / num_steps};
-
-    std::vector<Point> points;
-    for (auto i{0.0}; i < 1.0; i += normalized_step_size) {
-        auto scaled_source{source};
-        boost::geometry::multiply_value(scaled_source, 1 - i);
-
-        auto scaled_target{target};
-        boost::geometry::multiply_value(scaled_target, i);
-
-        boost::geometry::add_point(scaled_source, scaled_target);
-        points.push_back(scaled_source);
-    }
-
-    return points;
-}
-
-template <std::ranges::input_range Range, typename UnaryPredicate>
-constexpr auto find_stopping_point(Range &&r, UnaryPredicate should_stop) noexcept
-    -> std::optional<std::ranges::range_value_t<Range>> {
-    if (auto const one_past_stop{std::find_if(std::ranges::begin(r), std::ranges::end(r), should_stop)};
-        one_past_stop != std::cbegin(r)) {
-        return *std::prev(one_past_stop);
     }
 
     return std::nullopt;
