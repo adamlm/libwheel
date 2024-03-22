@@ -53,37 +53,6 @@ using VertexPath = std::vector<wheel::boost_graph_extensions::vertex_descriptor_
 template <wheel::boost_graph_extensions::boost_graph Graph, typename GoalRegion>
     requires std::same_as<vector_type_t<GoalRegion>, wheel::boost_graph_extensions::vertex_bundle_t<Graph>>
 [[nodiscard]]
-auto find_path_in_graph(Graph const &graph, wheel::boost_graph_extensions::vertex_descriptor_t<Graph> const &source,
-                        GoalRegion const &goal_region) noexcept -> std::optional<VertexPath<Graph>> {
-    using PredecessorList = std::vector<std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>>;
-    PredecessorList predecessors(boost::num_vertices(graph), std::nullopt);
-
-    auto const predecessor_recorder{boost::record_predecessors(predecessors.data(), boost::on_tree_edge{})};
-    auto const goal_checker{check_is_within_goal(goal_region, boost::on_tree_edge{})};
-    auto const visitor{boost::make_bfs_visitor(std::make_pair(predecessor_recorder, goal_checker))};
-
-    try {
-        boost::breadth_first_search(graph, boost::vertex(source, graph), boost::visitor(visitor));
-    } catch (wheel::boost_graph_extensions::early_search_termination<Graph> const &result) {
-        VertexPath<Graph> path;
-        for (std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> predecessor{
-                 result.get_last_vertex()};
-             predecessor != std::nullopt;) {
-            path.push_back(predecessor.value());
-            predecessor = predecessors.at(predecessor.value());
-        }
-
-        std::ranges::reverse(path);
-
-        return path;
-    }
-
-    return std::nullopt;
-}
-
-template <wheel::boost_graph_extensions::boost_graph Graph, typename GoalRegion>
-    requires std::same_as<vector_type_t<GoalRegion>, wheel::boost_graph_extensions::vertex_bundle_t<Graph>>
-[[nodiscard]]
 auto search_for_vertex_path(Graph const &graph, wheel::boost_graph_extensions::vertex_descriptor_t<Graph> const &source,
                             GoalRegion const &goal_region) noexcept -> std::optional<VertexPath<Graph>> {
     using PredecessorList = std::vector<std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>>;
