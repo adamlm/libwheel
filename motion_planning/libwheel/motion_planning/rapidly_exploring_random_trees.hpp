@@ -343,25 +343,32 @@ struct ExpansionsPerSearch {
     int value;
 };
 
-auto search_rrt(auto const &source, auto const &target, auto &sampler, auto const &vertex_selector,
-                auto const &local_planner, MaxExpansions max_expansions, ExpansionsPerSearch search_period)
-    -> std::optional<std::vector<std::remove_cvref_t<decltype(source)>>> {
+auto search_rrt(auto const &source, auto const &target, auto sampler, auto const &vertex_selector,
+                auto const &local_planner, MaxExpansions max_expansions, ExpansionsPerSearch search_period,
+                auto visitor) -> std::optional<std::vector<std::remove_cvref_t<decltype(source)>>> {
 
     // check for valid start and goal regions
 
     boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, std::remove_cvref_t<decltype(source)>> tree;
+    auto const index_map{boost::get(boost::vertex_index, tree)};
     auto const source_vertex{boost::add_vertex(source, tree)};
 
     for (auto const &expansion_count : ranges::views::iota(0U, max_expansions.count)) {
+        using Node = GraphNode<std::remove_cvref_t<decltype(source)>>;
+
         auto const sample{sampler.sample_space()};
         auto const selected_vertex{vertex_selector(tree, sample)};
+        visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
 
         auto const local_path{local_planner(tree[selected_vertex], sample)};
         auto const stopping_vertex{boost::add_vertex(local_path.back(), tree)};
+        visitor.on_add_node(Node{index_map[stopping_vertex], tree[stopping_vertex]});
 
         boost::add_edge(selected_vertex, stopping_vertex, tree);
+        visitor.on_add_edge(Node{index_map[selected_vertex], tree[selected_vertex]},
+                            Node{index_map[stopping_vertex], tree[stopping_vertex]});
 
-        if (static_cast<int>(expansion_count) % search_period.value != 0) {
+        if (static_cast<int>(expansion_count) % search_period.value == 0) {
             continue;
         }
 
