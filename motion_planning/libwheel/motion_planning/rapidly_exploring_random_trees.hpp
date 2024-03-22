@@ -24,21 +24,6 @@ namespace wheel::motion_planning {
 
 namespace detail {
 
-auto get_nearest_vertex(auto const &point, wheel::boost_graph_extensions::boost_graph auto const &graph,
-                        auto const &distance_metric) {
-    auto const [graph_cbegin, graph_cend] = boost::vertices(graph);
-    return *std::ranges::min_element(graph_cbegin, graph_cend,
-                                     [&graph = std::as_const(graph), &distance_metric = std::as_const(distance_metric),
-                                      &point = std::as_const(point)](auto const &a, auto const &b) {
-                                         return distance_metric(point, graph[a]) < distance_metric(point, graph[b]);
-                                     });
-}
-
-auto get_nearest_vertex(auto const &point, wheel::boost_graph_extensions::boost_graph auto const &graph) {
-    return get_nearest_vertex(point, graph,
-                              [](auto const &a, auto const &b) { return boost::geometry::distance(a, b); });
-}
-
 template <typename Region, typename Tag>
 class is_within_goal_checker : public boost::base_visitor<is_within_goal_checker<Region, Tag>> {
   public:
