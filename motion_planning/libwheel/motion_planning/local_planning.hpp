@@ -9,22 +9,25 @@
 
 namespace wheel::motion_planning {
 
+template <typename Space>
 struct StraightLinePlanner {
   public:
-    explicit StraightLinePlanner(MaxDistance max_distance) : max_distance_{max_distance} {}
+    explicit StraightLinePlanner(Space space, MaxDistance max_distance)
+        : space_{std::move(space)}, max_distance_{max_distance} {}
 
     auto operator()(auto const &source, auto const &target) const {
-        auto const exceeds_max_distance = [this, &source](auto const &point) {
-            return boost::geometry::distance(source, point) >= max_distance_.value;
+        auto const should_stop = [this, &source](auto const &point) {
+            return boost::geometry::distance(source, point) >= max_distance_.value || !is_within(point, this->space_);
         };
 
         auto const stopping_point{detail::find_stopping_point(
-            detail::interpolate_between(source, target, detail::MaxStepSize{0.1}), exceeds_max_distance)};
+            detail::interpolate_between(source, target, detail::MaxStepSize{0.1}), should_stop)};
 
         return std::vector{stopping_point.value()};
     }
 
   private:
+    Space space_;
     MaxDistance max_distance_{0.0};
 };
 

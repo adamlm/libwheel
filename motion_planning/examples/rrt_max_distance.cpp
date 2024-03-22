@@ -61,7 +61,7 @@ auto main() -> int {
     auto const search_result{wheel_mp::search_rrt(
         point_t{0.1, 0.1}, goal_region, wheel_mp::UniformSampler{search_space},
         wheel_mp::closest_vertex_selector{boost_geometry_distance},
-        wheel_mp::StraightLinePlanner{wheel_mp::MaxDistance{0.5}}, wheel_mp::MaxExpansions{100},
+        wheel_mp::StraightLinePlanner{search_space, wheel_mp::MaxDistance{0.5}}, wheel_mp::MaxExpansions{100},
         wheel_mp::ExpansionsPerSearch{10}, RrtRecorderVisitor{tree_nodes_output, tree_edges_output})};
 
     if (!search_result) {
