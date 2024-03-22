@@ -16,6 +16,7 @@
 #include "libwheel/motion_planning/find_path.hpp"
 #include "libwheel/motion_planning/is_within.hpp"
 #include "libwheel/motion_planning/iteration_count.hpp"
+#include "libwheel/motion_planning/param_types.hpp"
 #include "libwheel/motion_planning/sampling.hpp"
 #include "libwheel/motion_planning/type_traits.hpp"
 
@@ -172,10 +173,6 @@ class SimpleRrt {
   private:
     MaxExpansions max_expansions_{0U};
     SearchPeriod search_period_{1U};
-};
-
-struct MaxDistance {
-    double value;
 };
 
 class MaxDistanceRrt {
