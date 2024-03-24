@@ -1,3 +1,5 @@
+include(libwheel_target_set_compiler_warnings)
+
 add_executable(libwheel_motion_planning_tests
   test_space.cpp
   test_type_traits.cpp
