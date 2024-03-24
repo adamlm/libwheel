@@ -128,14 +128,14 @@ auto search_rrt(auto const &source, auto const &target, auto sampler, auto const
 
     boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, std::remove_cvref_t<decltype(source)>> tree;
     auto const index_map{boost::get(boost::vertex_index, tree)};
+
+    using Node = GraphNode<std::remove_cvref_t<decltype(source)>>;
     auto const source_vertex{boost::add_vertex(source, tree)};
+    visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
 
     for (auto const &expansion_count : ranges::views::iota(0U, max_expansions.count)) {
-        using Node = GraphNode<std::remove_cvref_t<decltype(source)>>;
-
         auto const sample{sampler.sample_space()};
         auto const selected_vertex{vertex_selector(tree, sample)};
-        visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
 
         auto const local_path{local_planner(tree[selected_vertex], sample)};
         auto const stopping_vertex{boost::add_vertex(local_path.back(), tree)};
