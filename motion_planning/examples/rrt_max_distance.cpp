@@ -83,6 +83,4 @@ auto main() -> int {
     fmt::print(goal_region_file, "{}", boost::geometry::dsv(goal_region, ",", "(", ")", ";", "[", "]", ":"));
 
     return 0;
-
-    return 0;
 }
