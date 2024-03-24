@@ -1,6 +1,7 @@
 #ifndef LIBWHEEL_MOTION_PLANNING_EXTERNAL_BOOST_GEOMETRY_HPP
 #define LIBWHEEL_MOTION_PLANNING_EXTERNAL_BOOST_GEOMETRY_HPP
 
+#include <fmt/ostream.h>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
@@ -69,5 +70,8 @@ struct wheel::motion_planning::customization::do_axis_aligned_bounding_orthotope
             DimensionalBound{min_x, max_x}, DimensionalBound{min_y, max_y}};
     };
 };
+
+template <typename Geometry>
+struct fmt::formatter<boost::geometry::detail::dsv::dsv_manipulator<Geometry>> : ostream_formatter {};
 
 #endif // LIBWHEEL_MOTION_PLANNING_EXTERNAL_BOOST_GEOMETRY_HPP
