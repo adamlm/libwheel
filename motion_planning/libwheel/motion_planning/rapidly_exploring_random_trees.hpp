@@ -45,8 +45,8 @@ auto search_for_vertex_path(Graph const &graph, wheel::boost_graph_extensions::v
 
         boost::breadth_first_search(
             graph, boost::vertex(source, graph),
-                                    boost::visitor(boost::make_bfs_visitor(std::pair{
-                                        boost::record_predecessors(predecessors.data(), boost::on_tree_edge{}),
+            boost::visitor(boost::make_bfs_visitor(std::pair{
+                boost::record_predecessors(predecessors.data(), boost::on_tree_edge{}),
                 wheel::boost_graph_extensions::check_predicate(is_within_goal, boost::on_examine_vertex{})})));
     } catch (wheel::boost_graph_extensions::predicate_satisfied<
              wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> const &result) {
@@ -80,7 +80,7 @@ struct null_rrt_visitor {
 };
 
 struct MaxExpansions {
-    std::size_t count;
+    int value;
 };
 
 namespace detail {
@@ -115,7 +115,7 @@ auto search_rrt(auto const &source, auto const &target, auto sampler, auto const
     auto const source_vertex{boost::add_vertex(source, tree)};
     visitor.on_add_node(Node{index_map[source_vertex], tree[source_vertex]});
 
-    for (auto const &expansion_count : ranges::views::iota(0U, max_expansions.count)) {
+    for (auto const &expansion_count : ranges::views::iota(0, max_expansions.value)) {
         auto const sample{sampler.sample_space()};
         auto const selected_vertex{vertex_selector(tree, sample)};
 
@@ -127,7 +127,7 @@ auto search_rrt(auto const &source, auto const &target, auto sampler, auto const
         visitor.on_add_edge(Node{index_map[selected_vertex], tree[selected_vertex]},
                             Node{index_map[stopping_vertex], tree[stopping_vertex]});
 
-        if (static_cast<int>(expansion_count) % search_period.value == 0) {
+        if (expansion_count % search_period.value == 0) {
             continue;
         }
 
