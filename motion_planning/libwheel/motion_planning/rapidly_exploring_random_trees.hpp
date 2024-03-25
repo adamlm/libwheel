@@ -79,10 +79,6 @@ struct null_rrt_visitor {
     auto on_add_edge(auto const & /* source */, auto const & /* target */) const noexcept -> void {}
 };
 
-struct SearchPeriod {
-    std::size_t count;
-};
-
 struct MaxExpansions {
     std::size_t count;
 };
