@@ -10,6 +10,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 #include <libwheel/boost_graph_extensions/exceptions.hpp>
 #include <libwheel/boost_graph_extensions/type_traits.hpp>
+#include <libwheel/boost_graph_extensions/visitors.hpp>
 #include <range/v3/view/iota.hpp>
 
 #include "libwheel/motion_planning/detail/interpolate_between.hpp"
@@ -24,29 +25,6 @@ namespace wheel::motion_planning {
 
 namespace detail {
 
-template <typename Region, typename Tag>
-class is_within_goal_checker : public boost::base_visitor<is_within_goal_checker<Region, Tag>> {
-  public:
-    using event_filter = Tag;
-
-    explicit is_within_goal_checker(Region const &r) : region_{r} {}
-
-    template <wheel::boost_graph_extensions::boost_graph Graph>
-    auto operator()(wheel::boost_graph_extensions::edge_descriptor_t<Graph> e, Graph const &g) const -> void {
-        if (auto const v{boost::target(e, g)}; motion_planning::is_within(g[v], region_)) {
-            throw wheel::boost_graph_extensions::early_search_termination<Graph>("found goal region", v);
-        }
-    }
-
-  private:
-    Region region_;
-};
-
-template <typename Region, typename Tag>
-auto check_is_within_goal(Region const &region, Tag /* tag */) noexcept -> is_within_goal_checker<Region, Tag> {
-    return is_within_goal_checker<Region, Tag>{region};
-}
-
 template <wheel::boost_graph_extensions::boost_graph Graph>
 using VertexPath = std::vector<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>>;
 
@@ -59,14 +37,22 @@ auto search_for_vertex_path(Graph const &graph, wheel::boost_graph_extensions::v
     PredecessorList predecessors(boost::num_vertices(graph), std::nullopt);
 
     try {
-        boost::breadth_first_search(graph, boost::vertex(source, graph),
+        auto const is_within_goal = [&graph,
+                                     &goal_region](wheel::boost_graph_extensions::vertex_descriptor_t<Graph> const &v,
+                                                   Graph const & /* graph */) {
+            return motion_planning::is_within(graph[v], goal_region);
+        };
+
+        boost::breadth_first_search(
+            graph, boost::vertex(source, graph),
                                     boost::visitor(boost::make_bfs_visitor(std::pair{
                                         boost::record_predecessors(predecessors.data(), boost::on_tree_edge{}),
-                                        check_is_within_goal(goal_region, boost::on_tree_edge{})})));
-    } catch (wheel::boost_graph_extensions::early_search_termination<Graph> const &result) {
+                wheel::boost_graph_extensions::check_predicate(is_within_goal, boost::on_examine_vertex{})})));
+    } catch (wheel::boost_graph_extensions::predicate_satisfied<
+             wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> const &result) {
         VertexPath<Graph> path;
         for (std::optional<wheel::boost_graph_extensions::vertex_descriptor_t<Graph>> predecessor{
-                 result.get_last_vertex()};
+                 result.get_satisfying_descriptor()};
              predecessor != std::nullopt;) {
             path.push_back(predecessor.value());
             predecessor = predecessors.at(predecessor.value());
